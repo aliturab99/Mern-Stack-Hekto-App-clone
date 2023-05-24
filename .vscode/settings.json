@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "**/admin/": true,
+        "**/client/": true
+    }
+}
