@@ -14,8 +14,8 @@ const router = express.Router();
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try{
-      await fs.mkdir(`content/${req.user._id}/`, {recursive: true});
-      cb(null, `content/${req.user._id}/` )
+      await fs.mkdir(`content/store`, {recursive: true});
+      cb(null, `content/store/` )
     }catch(err){
       cb(err, null)
     }
@@ -43,7 +43,7 @@ const upload = multer({
 // Adding Categories
 router.post("/add", async (req, res) => {
   const {
-      storeName,
+      siteName,
       tagline,
       logo,
       address,
@@ -57,7 +57,7 @@ router.post("/add", async (req, res) => {
 try {
 
   const store = new Store({
-    storeName,
+    siteName,
     tagline,
     logo,
     address,
@@ -78,42 +78,38 @@ try {
 // Editing Categories
 router.post(
   "/edit",
-  // upload.single("siteLogo"),
+  upload.single("siteLogo"),
   async (req, res
     ) => {
       try {
       const store = await Store.find();
-      console.log(req.body)
       if (!store)
           throw new Error("Invalid Id");
 
-          const {
-            storeName,
-            tagline,
-            logo,
-            address,
-            email,
-            phoneNumber,
-            facebookLink,
-            twitterLink,
-            instagramLink
-          } = req.body;
+          const record = {
+            siteName: req.body.siteName,
+            siteTagline: req.body.siteTagline,
+            siteAddress: req.body.siteAddress,
+            siteEmail: req.body.siteEmail,
+            sitePhoneNumber: req.body.sitePhoneNumber,
+            facebookLink: req.body.facebookLink,
+            twitterLink: req.body.twitterLink,
+            instagramLink: req.body.instagramLink
+          }
+          if(req.file && req.file.filename){
+            record.logo = req.file.filename
+          if(store.logo && store.logo !== req.file.filename){
+            const oldPicPath = `content/store/${store.logo}`
+            await fs.unlink(oldPicPath)
+          }
+          }
 
-      const updatedStore = await Store.findByIdAndUpdate(req.body.id, {
-        storeName,
-        tagline,
-        logo,
-        address,
-        email,
-        phoneNumber,
-        facebookLink,
-        twitterLink,
-        instagramLink
-      });
+          let updatedStore = await Store.findOneAndUpdate(store._id, record)
+          console.log(store)
+          console.log(updatedStore)
       res.json({ store: updatedStore })
 
   } catch (err) {
-    console.log("ahsdhjsagj")
       res.status(400).json({ error: err.message })
   }
 })

@@ -1,23 +1,22 @@
 import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { FORM_ERROR } from 'final-form';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Field, Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { showSuccess } from '../../store/actions/alertActions';
+import { showError, showSuccess } from '../../store/actions/alertActions';
 import { categoryActionTypes } from '../../store/actions/categoryActions';
 import TextInput from '../library/TextInput';
 import EditIcon from '@mui/icons-material/Edit';
 import FileInput from '../library/FileInput';
 import { loadStore } from '../../store/actions/storeActions';
+import { Result } from 'express-validator';
 
 
 function Configurations() {
 
-    const { id, rows, page } = useParams();
-
-
+    const [store, setStore] = useState({});
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -31,22 +30,23 @@ function Configurations() {
         return errors
     };
 
-useEffect(() => {
-    loadStore()
-})
-
-const handleUpdateStore = async (data, form) => {
+    useEffect(() => {
         try {
-            let result = await axios.postForm(
-                `api/store/edit`,
-                data
-            );
-            const fields = form.getRegisteredFields(); // Get all the registered field names
-            fields.forEach((field) => {
-                form.resetFieldState(field); // Reset the touched state for each field
-                form.change(field, null); // Reset the value of each field to null
+            axios.get("/api/store/").then(({ data }) => {
+                setStore(data.store[0])
+            })
+        } catch (err) {
+            dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
+        }
+    }, [])
+    console.log(store)
+
+    const handleUpdateStore = async (data, form) => {
+        try {
+            axios.postForm(`/api/store/edit`, data).then(result => {
+                console.log(result)
             });
-            dispatch(showSuccess("Category updated successfully"))
+            dispatch(showSuccess("Store updated successfully"))
             // Navigation will be added there
         } catch (error) {
             if (error.response && error.response.status === 400) {
@@ -57,11 +57,24 @@ const handleUpdateStore = async (data, form) => {
         }
 
     };
-  return (
-    <Box textAlign="center" maxWidth="500px" mx="auto">
+    return (
+        <Box textAlign="center" maxWidth="500px" mx="auto">
             <Form
                 onSubmit={handleUpdateStore}
                 // validate={validate}
+                initialValues={
+                    {
+                        siteName: store.siteName,
+                        siteLogo: store.siteLogo,
+                        siteAddress: store.siteAddress,
+                        siteEmail: store.siteEmail,
+                        sitePhoneNumber: store.sitePhoneNumber,
+                        facebookLink: store.facebookLink,
+                        twitterLink: store.twitterLink,
+                        instagramLink: store.instagramLink
+                    }
+                }
+
                 render={({
                     handleSubmit,
                     submitting,
@@ -72,9 +85,9 @@ const handleUpdateStore = async (data, form) => {
                     <form onSubmit={handleSubmit} method="post" encType="multipart/form-data">
                         <Field component={TextInput} type='text' name="siteName" placeholder="Enter Site Name" label="Site Name" />
                         <Field component={FileInput} name="siteLogo" />
-                        <Field component={TextInput} name="address" placeholder="address" label="Address" />
-                        <Field component={TextInput} name="email" placeholder="email" label="Email" />
-                        <Field component={TextInput} name="phoneNumber" placeholder="phoneNumber" label="Phone Number" />
+                        <Field component={TextInput} name="siteAddress" placeholder="address" label="Address" />
+                        <Field component={TextInput} name="siteEmail" placeholder="email" label="Email" />
+                        <Field component={TextInput} name="sitePhoneNumber" placeholder="phoneNumber" label="Phone Number" />
                         <Field component={TextInput} name="facebookLink" placeholder="facebookLink" label="FaceBook Link" />
                         <Field component={TextInput} name="twitterLink" placeholder="twitterLink" label="Twitter Link" />
                         <Field component={TextInput} name="instagramLink" placeholder="instagramLink" label="Instagram Link" />
@@ -86,9 +99,8 @@ const handleUpdateStore = async (data, form) => {
                                 variant="contained"
                                 color="success"
                                 startIcon={<EditIcon />}
-                                type="submit"
                                 fullWidth
-                                // disabled={submitting || invalid}
+                                type="submit"
                             >
                                 Update Store
                             </Button>
@@ -116,7 +128,7 @@ const handleUpdateStore = async (data, form) => {
                 )}
             />
         </Box>
-  )
+    )
 }
 
 export default Configurations

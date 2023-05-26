@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 mongoose.model('Store', {});
 
 const storeSchema = new mongoose.Schema({
-  storeName: {
+  siteName: {
     type: String,
     required: [true, "Store Name is required"],
     maxlength: 250
   },
-  email: {
+  siteEmail: {
     type: String,
     required: [true, "Email is required"],
     maxlength: 250,
@@ -21,18 +21,18 @@ const storeSchema = new mongoose.Schema({
       type: 'unique'
     }
   },
-  phoneNumber: {
+  sitePhoneNumber: {
     type: String,
     maxlength: 20
   },
-  address: {
+  siteAddress: {
     type: String,
   },
-  logo: {
+  siteLogo: {
     type: String,
     maxlength: 100
   },
-  tagline: {
+  siteTagline: {
     type: String,
     maxlength: 300
   },
