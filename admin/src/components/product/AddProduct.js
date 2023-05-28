@@ -128,6 +128,7 @@ function AddProduct( { categories } ) {
 }
 
 const mapStateToProps = state => {
+    console.log(state.categories.categories)
     return {
       categories: state.categories.categories,
     }

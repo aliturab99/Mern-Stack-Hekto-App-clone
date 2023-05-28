@@ -8,9 +8,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch } from 'react-redux';
-import { deleteUser } from '../../store/actions/userActions';
 
-function DeletePopUp({ id, page }) {
+function DeletePopUp({ id, page, actionToDispatch }) {
   const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
 
@@ -21,6 +20,11 @@ function DeletePopUp({ id, page }) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleDelete = () => {
+    dispatch(actionToDispatch(id, page))
+    handleClose();
+  }
 
   return (
     <div>
@@ -44,7 +48,7 @@ function DeletePopUp({ id, page }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={() => dispatch(deleteUser(id, page))} autoFocus>
+          <Button onClick={handleDelete} autoFocus>
             Delete
           </Button>
         </DialogActions>

@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Category = require("../models/Category")
-const verifyUser = require("../utils/middlewares");
 const { isSuperAdmin, isAdmin } = require("../utils/utils");
+const verifyuser = require("../utils/middlewares");
 
 
 const router = express.Router();
-router.use(verifyUser)
+// router.use(verifyuser)
 
 
 // Adding Categories
@@ -57,7 +57,7 @@ router.post("/edit", async (req, res) => {
           name,
           description
       });
-      res.json({ category: updatedCategory })
+      res.json({ category: await Category.findById(req.body.id)  })
 
   } catch (err) {
       res.status(400).json({ error: err.message })
@@ -74,13 +74,13 @@ try {
 
   // check for valid object Id using mongoose this will check the id is this id is according to formula of #
   if (!mongoose.isValidObjectId(req.body.id))
-    throw new Error("Invalid Id");
+    throw new Error("Invalid Id 1");
 
 
   // check for the valid id
   const category = await Category.findById(req.body.id)
   if (!category)
-    throw new Error("Invalid Id");
+    throw new Error("Invalid Id 2");
 
   await Category.findByIdAndDelete(req.body.id)
   res.json({ success: true })
@@ -113,5 +113,15 @@ try {
   res.status(400).json({ error: error.message });
 }
 });
+
+router.get("/all", async (req, res) => {
+  try {
+    const categories = await Category.find({});
+  
+    res.status(200).json({categories});
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+  });
 
 module.exports = router;

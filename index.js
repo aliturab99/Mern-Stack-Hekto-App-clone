@@ -20,7 +20,7 @@ app.use(cors())
 
 
 app.use('/api/users', userController)
-app.use('/api/category', categoryController)
+app.use('/api/categories', categoryController)
 app.use('/api/products', productController)
 app.use('/api/reviews', reviewController)
 app.use('/api/store', siteController)
