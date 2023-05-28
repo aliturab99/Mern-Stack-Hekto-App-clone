@@ -2,11 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Category = require("../models/Category")
 const { isSuperAdmin, isAdmin } = require("../utils/utils");
-const verifyuser = require("../utils/middlewares");
+const { verifyuser } = require("../utils/middlewares");
 
 
 const router = express.Router();
-// router.use(verifyuser)
+router.use(verifyuser)
+
+
 
 
 // Adding Categories

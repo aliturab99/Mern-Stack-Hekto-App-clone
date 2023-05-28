@@ -16,42 +16,41 @@ export const productActionTypes = {
   
 
 
-//Load All stores
-export const loadProducts = (currentPage = 1, recordsPerPage = process.env.REACT_APP_RECORDS_PER_PAGE) => {
-  return (dispatch, getState) => {
-    const state = getState();
-
-    if (state.products.allRecordsLoaded) // don't send request again and again if all records have loaded
-      return;
-
-    let skipRecords = 0;
-    if (state.products.products.length === 0)
-      dispatch(showProgressBar());
-
-    skipRecords = (parseInt(currentPage)) * parseInt(recordsPerPage);
-
-    axios.get('api/products', { params: { skip: skipRecords, limit: recordsPerPage } }).then(({ data }) => {
+  export const loadProducts = (currentPage = 1, recordsPerPage = process.env.REACT_APP_RECORDS_PER_PAGE) => {
+    return (dispatch, getState) => {
       const state = getState();
+  
+      if (state.products.allRecordsLoaded) // don't send request again and again if all records have loaded
+        return;
+  
+      let skipRecords = 0;
       if (state.products.products.length === 0)
+        dispatch(showProgressBar());
+  
+      skipRecords = (parseInt(currentPage)) * parseInt(recordsPerPage);
+  
+      axios.get('/products', { params: { skip: skipRecords, limit: recordsPerPage } }).then(({ data }) => {
+        const state = getState();
+        if (state.products.products.length === 0)
+          dispatch(hideProgressBar());
+  
+        const allRecordsLoaded = (state.products.products.length + data.products.length) === data.totalRecords;
+        dispatch({ type: productActionTypes.PRODUCTS_LOADED, payload: { products: data.products, totalRecords: data.totalRecords, allRecordsLoaded, page: currentPage } });
+        dispatch({ type: productActionTypes.UPDATE_PAGINATION_CURRENT_PAGE, payload: currentPage })
+      }).catch(err => {
         dispatch(hideProgressBar());
-
-      const allRecordsLoaded = (state.products.products.length + data.products.length) === data.totalRecords;
-      dispatch({ type: productActionTypes.PRODUCTS_LOADED, payload: { products: data.products, totalRecords: data.totalRecords, allRecordsLoaded, page: currentPage } });
-      dispatch({ type: productActionTypes.UPDATE_PAGINATION_CURRENT_PAGE, payload: currentPage })
-    }).catch(err => {
-      dispatch(hideProgressBar());
-      dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
-    });
+        dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
+      });
+    }
   }
-}
-
-export const deleteProduct = (id, page) => {
-  return (dispatch) => {
-    axios.delete('api/users/delete', { data: {id} }).then(() => {
-      dispatch({ type: productActionTypes.DELETE_PRODUCT, payload: {id, page} })
-      dispatch(showSuccess('Product deleted successfully'))
-    }).catch(error => {
-      dispatch(showError(error.message))
-    })
+  
+  export const deleteProduct = (id, page) => {
+    return (dispatch) => {
+      axios.delete('products/delete', { data: {id} }).then(() => {
+        dispatch({ type: productActionTypes.DELETE_PRODUCT, payload: {id, page} })
+        dispatch(showSuccess('Product deleted successfully'))
+      }).catch(error => {
+        dispatch(showError(error.message))
+      })
+    }
   }
-}

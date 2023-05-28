@@ -8,12 +8,12 @@ function SelectInput(props) {
     return (
         <FormControl fullWidth error={touched && error ? true : false}>
 
-            <InputLabel >{input.label}</InputLabel>
+            <InputLabel >{label}</InputLabel>
             <Select
                 {...input}
                 {...rest}
-                label={input.label}
-
+                label={label}
+                
             >
                 {
                     options.map((option, index) => {

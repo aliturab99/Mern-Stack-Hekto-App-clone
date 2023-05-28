@@ -3,10 +3,10 @@ import { Alert, Button, CircularProgress } from '@mui/material';
 import { Box } from '@mui/system';
 import axios from 'axios';
 import { FORM_ERROR } from 'final-form';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Field, Form } from 'react-final-form';
 import { connect, useSelector } from 'react-redux'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Navigate } from 'react-router-dom'
 import SelectInput from '../library/SelectInput';
 import TextInput from '../library/TextInput';
 import { useDispatch } from "react-redux";
@@ -14,28 +14,38 @@ import { showSuccess } from "../../store/actions/alertActions";
 import { userActionTypes } from '../../store/actions/userActions';
 import { productActionTypes } from '../../store/actions/productActions';
 import TextAreaInput from '../library/TextAreaInput';
+import FileInput from '../library/FileInput';
+import CheckBoxInput from '../library/CheckBoxInput';
 
 
 
-function EditProduct({ products }) {
+function EditProduct({ products, categories, brands }) {
   const { id, rows, page } = useParams();
   const productIndex = products.findIndex(product => product._id === id);
 
   const product = products[productIndex];
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    // dispatch(loadAllCategories())
+    // dispatch(loadAllBrands())
+  }, [])
+
+  if (!product)
+    return <Navigate to="/admin/products" />
+
 
 
   const validate = (data) => {
     const errors = {};
 
     if (!data.name)
-        errors.name = "Product Name is Required";
+      errors.name = "Product Name is Required";
     else if (data.name.length < 3)
-        errors.name = "Name Should be more then 3 Char";
+      errors.name = "Name Should be more then 3 Char";
     if (!data.price) errors.price = "Please Enter Price";
-    if (!data.category || data.category == ' ') errors.category = "Please Select Category";
+    if (!data.categoryId || data.categoryId == ' ') errors.categoryId = "Please Select Category";
     return errors
   };
 
@@ -44,21 +54,18 @@ function EditProduct({ products }) {
   const handleUpdateUser = async (data, form) => {
     try {
       data.id = id;
-      let result = await axios.post(
-        `api/products/edit`,
+      let result = await axios.postForm(
+        `/products/edit`,
         data
       );
 
-      const fields = form.getRegisteredFields(); // Get all the registered field names
-      fields.forEach((field) => {
-        form.resetFieldState(field); // Reset the touched state for each field
-        form.change(field, null); // Reset the value of each field to null
-      });
       dispatch({ type: productActionTypes.EDIT_PRODUCT, payload: { product: result.data.product, productIndex } })
       dispatch(showSuccess("Product updated successfully"))
-      navigate(`/admin/dashboard/products/${rows}/${page}`);
+      navigate(`/admin/products/${rows}/${page}`);
       // Navigation will be added there
     } catch (error) {
+
+
       if (error.response && error.response.status === 400) {
         return { [FORM_ERROR]: error.response.data.errors };
       }
@@ -76,10 +83,16 @@ function EditProduct({ products }) {
         initialValues={
           {
             name: product && product.name,
-            description: product && product.description,
+            shortDescription: product && product.shortDescription,
             price: product && product.price,
             sale_price: product && product.sale_price,
-            category: product && product.category,
+            discountPrice: product && product.discountPrice,
+            categoryId: product && product.categoryId,
+            brandId: product && product.brandId,
+            color: product && product.color,
+            tags: product && product.tags,
+            longDescription: product && product.longDescription,
+            additionalInformation: product && product.additionalInformation,
           }
         }
         render={({
@@ -91,10 +104,40 @@ function EditProduct({ products }) {
         }) => (
           <form onSubmit={handleSubmit} method="post" encType="multipart/form-data">
             <Field component={TextInput} type='text' name="name" placeholder="Enter Product Name" label="Name" />
-            <Field component={TextAreaInput} type='text' name="description" placeholder="Product Description" label="Description" />
+            <Field component={TextAreaInput} type='text' name="shortDescription" placeholder="Product short description" label="Short description" />
             <Field component={TextInput} type='number' name="price" placeholder="Product Price" label="Price" />
             <Field component={TextInput} type='number' name="sale_price" placeholder="Sale Price" label="Sale Price" />
-            <Field component={SelectInput} name="category" label="Category" options={[{ label: "Select Category", value: ' ' }, { label: "Category 1", value: process.env.REACT_APP_USER_TYPE_SUPERADMIN }, { label: "Category 2", value: process.env.REACT_APP_USER_TYPE_ADMIN }, { label: "Category 3", value: process.env.REACT_APP_USER_TYPE_STANDARD }]} />
+            <Field component={TextInput} type='number' name="discountPrice" placeholder="Discount Price" label="Discount Price" />
+            <Field component={TextInput} type='color' name="color" placeholder="Color" label="Color" />
+            <Field component={TextInput} type='text' name="tags" placeholder="Product Tags" label="Tags" />
+            <Field component={TextAreaInput} type='text' name="longDescription" placeholder="Product long description" label="Long Description" />
+            <Field component={TextAreaInput} type='text' name="additionalInformation" placeholder="Additional information" label="Additional information" />
+            <Field component={FileInput} name="productPictures" inputProps={{ accept: "image/*", multiple: true }} />
+
+            {/* <Field
+              component={SelectInput}
+              name="categoryId"
+              value={product.categoryId}
+              label="Select category"
+              options={
+                categories && categories.map(category => ({ label: category.name, value: category._id }))
+              } />
+
+            <Field
+              component={SelectInput}
+              name="brandId"
+              value={product.brandId}
+              label="Select brand"
+              options={
+
+                brands && brands.map(brand => ({ label: brand.name, value: brand._id }))
+
+              } /> */}
+
+            <Field component={CheckBoxInput} type="checkbox" checked={product.isFeatured} name="isFeatured" label="Featured" />
+            <Field component={CheckBoxInput} type="checkbox" checked={product.isTrending} name="isTrending" label="Trending" />
+            <Field component={CheckBoxInput} type="checkbox" checked={product.isTop} name="isTop" label="Top" />
+
             {submitting ? (
               <CircularProgress />
             ) : (
@@ -121,14 +164,7 @@ function EditProduct({ products }) {
                 ))}
               </Box>
             )}
-            <Box mt={2}>
-              {/* {error && <Alert severity="error">{error}</Alert>} */}
-            </Box>
-            <Box mt={2}>
-              {submitSucceeded && !submitting && (
-                <Alert color="success">User Added Successfully</Alert>
-              )}
-            </Box>
+
           </form>
         )}
       />
@@ -138,7 +174,9 @@ function EditProduct({ products }) {
 
 const mapStatetoProps = (state) => {
   return {
-    products: state.products.products
+    products: state.products.products,
+    categories: state.categories.allCategories,
+    brands: state.brands.allBrands,
   }
 }
 const Wrapper = connect(mapStatetoProps)
