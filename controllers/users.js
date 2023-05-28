@@ -4,13 +4,13 @@ const mongoose = require("mongoose");
 const { createJWTToken, isSuperAdmin } = require('../utils/utils');
 const { checkSchema, validationResult } = require('express-validator');
 const User = require("../models/User")
-const verifyUser = require("../utils/middlewares")
+const {verifyuser} = require("../utils/middlewares")
 const { randomBytes } = require('crypto');
 const { default: axios } = require('axios');
 
 
 const router = express.Router();
-router.use(['/profile-settings', '/add', '/edit', '/delete', "/profile"], verifyUser);
+router.use(['/profile-settings', '/add', '/edit', '/delete', "/profile"], verifyuser);
 
 router.post("/login", async (req, res) => {
   try {
