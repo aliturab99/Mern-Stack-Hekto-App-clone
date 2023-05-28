@@ -53,7 +53,6 @@ export const loadCategories = (currentPage = 1, recordsPerPage = process.env.REA
 
 export const deleteCategory = (id, page) => {
   return (dispatch) => {
-    console.log(id)
     axios.delete('api/categories/delete', { data: { id } }).then(() => {
       dispatch({ type: categoryActionTypes.DELETE_CATEGORY, payload: { id, page } })
       dispatch(showSuccess('Category deleted successfully'))
@@ -71,7 +70,6 @@ export const loadAllCategories = () => {
 
     dispatch(showProgressBar());
     axios.get('api/categories/all').then(({ data }) => {
-
       dispatch(hideProgressBar());
       dispatch({ type: categoryActionTypes.ALL_CATEGORIES_LOADED, payload: data.categories });
     }).catch(err => {

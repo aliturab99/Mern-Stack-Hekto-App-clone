@@ -13,14 +13,16 @@ import SelectInput from '../library/SelectInput'
 import TextAreaInput from '../library/TextAreaInput'
 import TextInput from '../library/TextInput'
 import CheckBoxInput from '../library/CheckBoxInput'
+import { loadAllCategories } from '../../store/actions/categoryActions'
 
 function AddProduct( {  categories, brands } ) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    console.log(categories)
 
     useEffect(() => {
-        // dispatch(loadAllCategories())
+        dispatch(loadAllCategories())
         // dispatch(loadAllBrands())
     }, [])
 
@@ -42,7 +44,7 @@ function AddProduct( {  categories, brands } ) {
     const handleAddProduct = async (data, form) => {
         try {
             let result = await axios.postForm(
-                "http://localhost:5000/api/products/add",
+                "api/products/add",
                 data
             );
             const fields = form.getRegisteredFields(); // Get all the registered field names
@@ -52,7 +54,7 @@ function AddProduct( {  categories, brands } ) {
             });
             dispatch({ type: productActionTypes.ADD_PRODUCT, payload: result.data.product })
             dispatch(showSuccess("Product added successfully"))
-            navigate("/admin/products");
+            navigate("/admin/dashboard/products");
         } catch (error) {
             if (error.response && error.response.status === 400) {
                 return { [FORM_ERROR]: error.response.data.errors };
@@ -89,14 +91,14 @@ function AddProduct( {  categories, brands } ) {
                         <Field component={TextAreaInput} type='text' name="additionalInformation" placeholder="Additional information" label="Additional information" />
                         <Field component={FileInput} name="productPictures" inputProps={{ accept: "image/*", multiple: true }} />
                         
-                        {/* <Field
+                        <Field
                             component={SelectInput}
                             name="categoryId"
                             label="Select category"
                             options={
                                 categories && categories.map(category => ({ label: category.name, value: category._id }))
                             }
-                            /> */}
+                            />
 
                         {/* <Field
                             component={SelectInput}
@@ -130,13 +132,13 @@ function AddProduct( {  categories, brands } ) {
                             <Box mt={2}><Alert severity="error">{submitError}</Alert></Box>
                         )}
 
-                        {/* {submitError && Array.isArray(submitError) && (
+                        {submitError && Array.isArray(submitError) && (
                             <Box mt={2}>
                                 {submitError.map((error, index) => (
                                     <Alert key={index} severity="error">{error}</Alert>
                                 ))}
                             </Box>
-                        )} */}
+                        )}
                         <Box mt={2}>
                             {/* {error && <Alert severity="error">{error}</Alert>} */}
                         </Box>
@@ -151,7 +153,7 @@ function AddProduct( {  categories, brands } ) {
 const mapStateToProps = state => {
     console.log(state.categories.categories)
     return {
-        // categories: state.categories.allCategories,
+        categories: state.categories.allCategories,
         // brands: state.brands.allBrands,
     }
 }
