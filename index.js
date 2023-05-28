@@ -8,7 +8,7 @@ const userController = require("./controllers/users")
 const categoryController = require("./controllers/categories")
 const productController = require("./controllers/products")
 const reviewController = require("./controllers/reviews")
-const storeController = require("./controllers/store")
+const siteController = require("./controllers/configurations")
 
 
 
@@ -23,7 +23,7 @@ app.use('/api/users', userController)
 app.use('/api/category', categoryController)
 app.use('/api/products', productController)
 app.use('/api/reviews', reviewController)
-app.use('/api/store', storeController)
+app.use('/api/store', siteController)
 
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URI).then( () => {

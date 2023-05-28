@@ -6,12 +6,9 @@ import { Field, Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { showError, showSuccess } from '../../store/actions/alertActions';
-import { categoryActionTypes } from '../../store/actions/categoryActions';
 import TextInput from '../library/TextInput';
 import EditIcon from '@mui/icons-material/Edit';
 import FileInput from '../library/FileInput';
-import { loadStore } from '../../store/actions/storeActions';
-import { Result } from 'express-validator';
 
 
 function Configurations() {
@@ -33,13 +30,13 @@ function Configurations() {
     useEffect(() => {
         try {
             axios.get("/api/store/").then(({ data }) => {
-                setStore(data.store[0])
+                console.log(data)
+                setStore(data)
             })
         } catch (err) {
             dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
         }
     }, [])
-    console.log(store)
 
     const handleUpdateStore = async (data, form) => {
         try {
