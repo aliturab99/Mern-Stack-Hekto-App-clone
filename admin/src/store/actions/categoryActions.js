@@ -1,18 +1,23 @@
-import { showError } from "./alertActions";
+import { showError, showSuccess } from "./alertActions";
 import { hideProgressBar, showProgressBar } from "./progressActions";
 import axios from 'axios';
 
 export const categoryActionTypes = {
-  "ADD_CATEGORY": "addCategory",
-  "UPDATE_CATEGORY": "updateCategory",
-  "DELETE_CATEGORY": "deleteCategory",
-  'CATEGORIES_LIST' : 'category List',
+  "ADD_CATEGORY": "ADD_CATEGORY",
+  "EDIT_CATEGORY": "EDIT_CATEGORY",
+  "DELETE_CATEGORY": "DELETE_CATEGORY",
+  "CATEGORIES_LOADED": "CATEGORIES_LOADED",
+  "RESET_CATEGORY": "RESET_CATEGORY",
+  "UPDATE_ROWS_PERPAGE": "UPDATE_ROWS_PERPAGE",
+  "UPDATE_PAGINATION_CURRENT_PAGE": "UPDATE_PAGINATION_CURRENT_PAGE",
+
+  "ALL_CATEGORIES_LOADED": "ALL_CATEGORIES_LOADED",
 }
 
 export const addCategory = (category) => {
   return {
     type: categoryActionTypes.ADD_CATEGORY,
-    category
+    payload: category
   }
 }
 
@@ -30,15 +35,46 @@ export const loadCategories = (currentPage = 1, recordsPerPage = process.env.REA
     else
       skipRecords = (currentPage) * recordsPerPage;
 
-    axios.get('api/category', { params: { skip: skipRecords, limit: recordsPerPage} }).then(({ data }) => {
+    axios.get('api/categories', { params: { skip: skipRecords, limit: recordsPerPage } }).then(({ data }) => {
+      
       const state = getState();
       if (state.categories.categories.length === 0)
         dispatch(hideProgressBar());
 
-      const allRecordsLoaded = (state.categories.categories.length + data.categories.length ) === data.totalRecords;
-      dispatch({ type: categoryActionTypes.CATEGORIES_LIST, payload: { categories: data.categories, totalRecords: data.totalRecords, allRecordsLoaded, page: currentPage } });
+      const allRecordsLoaded = (state.categories.categories.length + data.categories.length) === data.totalRecords;
+      dispatch({ type: categoryActionTypes.CATEGORIES_LOADED, payload: { categories: data.categories, totalRecords: data.totalRecords, allRecordsLoaded, page: currentPage } });
     }).catch(err => {
-      console.log(err)
+      dispatch(hideProgressBar());
+      dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
+    });
+  }
+}
+
+
+export const deleteCategory = (id, page) => {
+  return (dispatch) => {
+    console.log(id)
+    axios.delete('api/categories/delete', { data: { id } }).then(() => {
+      dispatch({ type: categoryActionTypes.DELETE_CATEGORY, payload: { id, page } })
+      dispatch(showSuccess('Category deleted successfully'))
+    }).catch(error => {
+      dispatch(showError(error.message))
+    })
+  }
+}
+
+export const loadAllCategories = () => {
+  return (dispatch, getState) => {
+    const state = getState();
+    if (state.categories.allCategoriesLoaded) // don't send request again and again if all records have loaded
+      return;
+
+    dispatch(showProgressBar());
+    axios.get('api/categories/all').then(({ data }) => {
+
+      dispatch(hideProgressBar());
+      dispatch({ type: categoryActionTypes.ALL_CATEGORIES_LOADED, payload: data.categories });
+    }).catch(err => {
       dispatch(hideProgressBar());
       dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
     });

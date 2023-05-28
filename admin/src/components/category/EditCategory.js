@@ -6,10 +6,9 @@ import { FORM_ERROR } from 'final-form';
 import React from 'react'
 import { Field, Form } from 'react-final-form';
 import { connect } from 'react-redux'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch } from "react-redux";
-import { showSuccess } from "../../store/actions/alertActions";
-import SelectInput from '../library/SelectInput';
+import { showError, showSuccess } from "../../store/actions/alertActions";
 import TextInput from '../library/TextInput';
 import { categoryActionTypes } from '../../store/actions/categoryActions';
 
@@ -40,25 +39,17 @@ function EditCategory({ categories }) {
         try {
             data.id = id;
             let result = await axios.post(
-                `api/category/edit`,
+                `/categories/edit`,
                 data
             );
 
-            const fields = form.getRegisteredFields(); // Get all the registered field names
-            fields.forEach((field) => {
-                form.resetFieldState(field); // Reset the touched state for each field
-                form.change(field, null); // Reset the value of each field to null
-            });
-            dispatch({ type: categoryActionTypes.UPDATE_CATEGORY, payload: { category: result.data.category, categoryIndex } })
+            dispatch({ type: categoryActionTypes.EDIT_CATEGORY, payload: { category: result.data.category, categoryIndex } })
             dispatch(showSuccess("Category updated successfully"))
-            navigate(`/admin/dashboard/categories/${rows}/${page}`);
+            navigate(`/admin/categories/${rows}/${page}`);
             // Navigation will be added there
         } catch (error) {
-            if (error.response && error.response.status === 400) {
-                return { [FORM_ERROR]: error.response.data.errors };
-            }
-            else
-                return { [FORM_ERROR]: error.message };
+            let message = error && error.response && error.response.data ? error.response.data.error : error.message;
+            dispatch(showError(message))
         }
 
     };
@@ -110,14 +101,7 @@ function EditCategory({ categories }) {
                                 ))}
                             </Box>
                         )}
-                        <Box mt={2}>
-                            {/* {error && <Alert severity="error">{error}</Alert>} */}
-                        </Box>
-                        <Box mt={2}>
-                            {submitSucceeded && !submitting && (
-                                <Alert color="success">Category Added Successfully</Alert>
-                            )}
-                        </Box>
+                       
                     </form>
                 )}
             />

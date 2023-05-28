@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Grid, Box, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, IconButton, Paper, Pagination, Chip } from '@mui/material';
+import { Grid, Box, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, IconButton, Paper, Pagination, Chip, Typography, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import { useEffect } from 'react';
@@ -8,12 +8,17 @@ import DeletePopUp from '../common/DeletePopUp'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
-import { loadCategories } from '../../store/actions/categoryActions';
-import { Link } from 'react-router-dom';
+import { categoryActionTypes, deleteCategory, loadCategories } from '../../store/actions/categoryActions';
+import { Link, useParams } from 'react-router-dom';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import AddIcon from '@mui/icons-material/Add';
+
 
 const columns = [
   { id: 'categoryName', label: 'Name', },
   { id: 'categoryDescription', label: 'Description' },
+  { id: 'categoryCreatedOn', label: 'Created On' },
+  { id: 'categoryActions', label: 'Actions' },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -72,31 +77,32 @@ const useStyles = makeStyles((theme) => ({
 
 
 function Categories({ categories, totalRecords, paginationArray, dispatch }) {
-  const [rowsPerPage, setRowsPerPage] = useState(parseInt(process.env.REACT_APP_RECORDS_PER_PAGE));
-  const [page, setPage] = useState(0);
-  const [rowsPerPageChanged, setRowsPerPageChanged] = useState(false);
+  const { recordsPerPage, pageNumber } = useParams(); // while coming back from Edit item
+
+  const [page, setPage] = useState(pageNumber ? parseInt(pageNumber) : 0);
+  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(process.env.REACT_APP_RECORDS_PER_PAGE));
   const classes = useStyles();
 
+  const totalPages = useMemo(() => Math.ceil(totalRecords / rowsPerPage), [categories, rowsPerPage]);
 
   useEffect(() => {
-    dispatch(loadCategories(page, rowsPerPage))
-  }, [page, rowsPerPage])
+    if (!paginationArray[page]) {
+      dispatch(loadCategories(page, rowsPerPage))
+    }
 
+  }, [page, rowsPerPage])
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage - 1);
-    // listRef.current && listRef.current.scrollToItem(0);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(event.target.value);
-    setRowsPerPageChanged(true)
     setPage(0);
-    dispatch({ type: '' })
-    // listRef.current && listRef.current.scrollToItem(0);
+    dispatch({ type: categoryActionTypes.RESET_CATEGORY })
+    dispatch({ type: categoryActionTypes.UPDATE_ROWS_PERPAGE, payload: event.target.value })
   };
 
-  const totalPages = useMemo(() => Math.ceil(totalRecords / rowsPerPage), [categories, rowsPerPage]);
 
   const visibleRows = React.useMemo(() => {
     if (paginationArray[page]) {
@@ -107,10 +113,25 @@ function Categories({ categories, totalRecords, paginationArray, dispatch }) {
     }
   }, [categories, page, rowsPerPage]);
 
+  const refreshList = () => {
+    dispatch({ type: categoryActionTypes.RESET_CATEGORY })
+    if(page === 0)
+      dispatch(loadCategories(page, rowsPerPage))
+    else
+      setPage(0);
+  }
+
   return (
     <Grid container>
       <Grid item md={12} xs={12}>
         <TableContainer component={Paper} className={classes.tableContainer}>
+          <Box display="flex" justifyContent='space-between' m={3}>
+            <Typography variant="h5">Categories</Typography>
+            <Box>
+              <Button component={Link} to="/admin/categories/add" variant="outlined" startIcon={<AddIcon />}>Add</Button>
+              <Button sx={{ ml: 1 }} onClick={refreshList} variant="outlined" endIcon={<RefreshIcon />}>Refresh</Button>
+            </Box>
+          </Box>
           <Table aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -122,41 +143,27 @@ function Categories({ categories, totalRecords, paginationArray, dispatch }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {visibleRows.map((row) => (
-                <TableRow key={row._id} className={classes.headerRow}>
+              {visibleRows.map((row) => {
+                if (row.is_deleted) return;
+                return <TableRow key={row._id} className={classes.headerRow}>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.description}</TableCell>
-                  <TableCell>
-                    {
-                      row.type == process.env.REACT_APP_USER_TYPE_SUPERADMIN ?
-                        <Chip size='small' label="Super Admin" color="primary" /> :
-                        row.type == process.env.REACT_APP_USER_TYPE_ADMIN ?
-                          <Chip size='small' label="Admin" color="success" /> :
-                          <Chip size='small' label="Standard" color="info" />
-                    }
-                  </TableCell>
-                  <TableCell>
-                    {
-                      row.active == process.env.REACT_APP_STATUS_ACTIVE ?
-                        <Chip size='small' label="Active" color="success" /> :
-                        <Chip size='small' label="Not Active" color="primary" />
-                    }
-                  </TableCell>
                   <TableCell>
                     {
                       format(new Date(row.created_on), 'dd MMMM, yyyy')
                     }
                   </TableCell>
                   <TableCell sx={{ display: "flex" }}>
-                    <Link to={"/admin/dashboard/categories/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
+                    <Link to={"/admin/categories/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
                       <IconButton sx={{ color: "blue" }}>
                         <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                       </IconButton>
                     </Link>
-                    <DeletePopUp />
+                    <DeletePopUp id={row._id} page={page} actionToDispatch={deleteCategory} />
                   </TableCell>
                 </TableRow>
-              ))}
+              }
+              )}
             </TableBody>
           </Table>
           <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -165,8 +172,7 @@ function Categories({ categories, totalRecords, paginationArray, dispatch }) {
               component="div"
               count={totalRecords}
               rowsPerPage={rowsPerPage}
-              page={page}
-              // page={users.length ? page - 1 : 0}
+              page={categories.length ? page : 0}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               backIconButtonProps={{
@@ -195,7 +201,7 @@ const mapStateToProps = state => {
     categories: state.categories.categories,
     totalRecords: state.categories.totalRecords,
     loadingRecords: state.progressBar.loading,
-    paginationArray: state.categories.paginationArray
+    paginationArray: state.categories.paginationArray,
   }
 }
 

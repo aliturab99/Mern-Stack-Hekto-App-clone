@@ -24,22 +24,22 @@ const AddCategory = () => {
 
   const handleAddCategory = async (data, form) => {
     try {
-      let result = await axios.post( "api/category/add", data );
+      let result = await axios.post( "api/categories/add", data );
       dispatch(addCategory(result.data.category));
       const fields = form.getRegisteredFields(); // Get all the registered field names
       fields.forEach((field) => {
         form.resetFieldState(field); // Reset the touched state for each field
         form.change(field, null); // Reset the value of each field to null
       });
-      navigate("/admin/dashboard/categories"); dispatch({ type: categoryActionTypes.ADD_CATEGORY, payload: result.data.category })
       dispatch(showSuccess("Category added successfully"))
-      navigate("/admin/dashboard/categories");
+      navigate("/admin/categories");
     } catch (err) {
       let message = err && err.response && err.response.data ? err.response.data.error : err.message;
       dispatch(showError(message))
     }
 
   };
+
 
 
   return (
@@ -84,14 +84,6 @@ const AddCategory = () => {
                 ))}
               </Box>
             )}
-            <Box mt={2}>
-              {/* {error && <Alert severity="error">{error}</Alert>} */}
-            </Box>
-            <Box mt={2}>
-              {submitSucceeded && !submitting && (
-                <Alert color="success">Category Added Successfully</Alert>
-              )}
-            </Box>
           </form>
         )}
       />
@@ -99,4 +91,4 @@ const AddCategory = () => {
   );
 }
 
-export default AddCategory
+export default AddCategory;

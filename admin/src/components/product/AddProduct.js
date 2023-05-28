@@ -149,6 +149,7 @@ function AddProduct( {  categories, brands } ) {
 }
 
 const mapStateToProps = state => {
+    console.log(state.categories.categories)
     return {
         // categories: state.categories.allCategories,
         // brands: state.brands.allBrands,
