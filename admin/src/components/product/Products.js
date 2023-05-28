@@ -1,18 +1,19 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Grid, Box, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, IconButton, Paper, Pagination, Chip } from '@mui/material';
+import { Grid, Box, Table, TableBody, TableCell, TableHead, TableRow, TablePagination, IconButton, Paper, Pagination, Chip, Button, Typography, Rating } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { connect } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import TableContainer from '@mui/material/TableContainer';
-import { loadUsers, userActionTypes } from '../../store/actions/userActions';
-
 import DeletePopUp from '../common/DeletePopUp'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faStar } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
-import { loadProducts, productActionTypes } from '../../store/actions/productActions';
+import { deleteProduct, loadProducts, productActionTypes } from '../../store/actions/productActions';
 import { loadCategories } from '../../store/actions/categoryActions';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import AddIcon from '@mui/icons-material/Add';
+
 
 const columns = [
   { id: 'productName', label: 'Name', },
@@ -23,6 +24,7 @@ const columns = [
     align: 'left',
 
   },
+  { id: 'productRating', label: 'Rating' },
   {
     id: 'category',
     label: 'Category',
@@ -101,9 +103,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function Products({ products, totalRecords, paginationArray, dispatch, categories }) {
+function Products({ products, totalRecords, paginationArray, categories, dispatch }) {
   const { recordsPerPage, pageNumber } = useParams(); // while coming back from Edit item
-  console.log(categories)
 
   const [page, setPage] = useState(pageNumber ? parseInt(pageNumber) : 0);
   const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(process.env.REACT_APP_RECORDS_PER_PAGE));
@@ -111,10 +112,11 @@ function Products({ products, totalRecords, paginationArray, dispatch, categorie
 
   const totalPages = useMemo(() => Math.ceil(totalRecords / rowsPerPage), [products, rowsPerPage]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!paginationArray[page]) {
       dispatch(loadProducts(page, rowsPerPage))
-      dispatch(loadCategories())
     }
 
   }, [page, rowsPerPage])
@@ -140,10 +142,30 @@ function Products({ products, totalRecords, paginationArray, dispatch, categorie
     }
   }, [products, page, rowsPerPage]);
 
+  const handleReviewsPage = (url) => {
+    // dispatch({ type: reviewActionTypes.RESET_REVIEW })
+    navigate(url)
+  }
+
+  const refreshList = () => {
+    dispatch({ type: productActionTypes.RESET_PRODUCT })
+    if (page === 0)
+      dispatch(loadProducts(page, rowsPerPage))
+    else
+      setPage(0);
+  }
+
   return (
     <Grid container>
       <Grid item md={12} xs={12}>
         <TableContainer component={Paper} className={classes.tableContainer}>
+          <Box display="flex" justifyContent='space-between' m={3}>
+            <Typography variant="h5">Products</Typography>
+            <Box>
+              <Button component={Link} to="/admin/products/add" variant="outlined" startIcon={<AddIcon />}>Add</Button>
+              <Button sx={{ ml: 1 }} onClick={refreshList} variant="outlined" endIcon={<RefreshIcon />}>Refresh</Button>
+            </Box>
+          </Box>
           <Table aria-label="customized table">
             <TableHead>
               <TableRow>
@@ -161,16 +183,14 @@ function Products({ products, totalRecords, paginationArray, dispatch, categorie
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.price}</TableCell>
                   <TableCell>{row.sale_price}</TableCell>
+                  <TableCell><Rating value={row.averageRating} precision={0.5} readOnly /></TableCell>
                   <TableCell>
-                    <Chip size='small' label={
+                    {
                       categories && categories.map(category => {
-                        if (category._id === row.categoryId) {
-                          return category.name
-                        }
-                      }
-                      )
+                        if (row.categoryId == category._id)
+                          return <Chip size='small' label={category.name} color="info" />
+                      })
                     }
-                      color="primary" />
                   </TableCell>
                   <TableCell>
                     {
@@ -184,13 +204,20 @@ function Products({ products, totalRecords, paginationArray, dispatch, categorie
                       format(new Date(row.created_on), 'dd MMMM, yyyy')
                     }
                   </TableCell>
-                  <TableCell sx={{ display: "flex" }}>
-                    <Link to={"/admin/dashboard/products/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
+                  <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                    <Link to={"/admin/products/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
                       <IconButton sx={{ color: "blue" }}>
                         <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                       </IconButton>
                     </Link>
-                    <DeletePopUp id={row._id} page={page} />
+                    <DeletePopUp
+                    id={row._id}
+                    page={page}
+                    actionToDispatch={deleteProduct}
+                    />
+                    <IconButton sx={{ color: "#FF9529" }} onClick={() => handleReviewsPage("/admin/products/reviews/" + row._id)}>
+                      <FontAwesomeIcon icon={faStar} style={{ fontSize: "1rem" }} />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               }
@@ -225,7 +252,6 @@ function Products({ products, totalRecords, paginationArray, dispatch, categorie
 
   )
 }
-
 
 const mapStateToProps = state => {
   return {
