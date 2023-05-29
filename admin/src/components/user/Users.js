@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import TableContainer from '@mui/material/TableContainer';
-import { loadUsers, userActionTypes } from '../../store/actions/userActions';
+import { deleteUser, loadUsers, userActionTypes } from '../../store/actions/userActions';
 
 import DeletePopUp from '../common/DeletePopUp'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -187,7 +187,7 @@ function Users({ users, totalRecords, paginationArray, dispatch }) {
                         <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                       </IconButton>
                     </Link>
-                    <DeletePopUp id={row._id} page={page}/>
+                    <DeletePopUp id={row._id} page={page} actionToDispatch={deleteUser}/>
                   </TableCell>
                 </TableRow>
               }

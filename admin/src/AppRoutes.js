@@ -15,6 +15,7 @@ import Users from './components/user/Users';
 import Brands from './components/brands/Brands';
 import AddBrand from './components/brands/AddBrand';
 import EditBrand from './components/brands/EditBrand';
+import Reviews from './components/product/Reviews';
 
 function AppRoutes() {
 
@@ -44,6 +45,8 @@ function AppRoutes() {
                 <Route path="products/add" element={<AddProduct />} />
                 <Route path="products/edit/:id/:rows/:page/" element={<EditProduct />} />
                 <Route path="products/:recordsPerPage/:pageNumber/" element={<Products />} />
+                <Route path="products/reviews/:productId/" element={<Reviews />} />
+
 
                 {/* Categories Routes */}
                 <Route path="categories" element={<Categories />} />

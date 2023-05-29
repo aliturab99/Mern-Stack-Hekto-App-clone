@@ -37,7 +37,7 @@ function EditBrand({ brands }) {
         try {
             data.id = id;
             let result = await axios.post(
-                `/brands/edit`,
+                `/api/brands/edit`,
                 data
             );
 

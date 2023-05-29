@@ -55,7 +55,7 @@ function EditProduct({ products, categories, brands }) {
     try {
       data.id = id;
       let result = await axios.postForm(
-        `/products/edit`,
+        `/api/products/edit`,
         data
       );
 
