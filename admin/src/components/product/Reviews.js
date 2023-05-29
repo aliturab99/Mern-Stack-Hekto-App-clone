@@ -146,11 +146,11 @@ function Reviews({ reviews, totalRecords, paginationArray, categories, dispatch 
                                         }
                                     </TableCell>
                                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                                        <Link to={"/admin/reviews/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
+                                        {/* <Link to={"/admin/reviews/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
                                             <IconButton sx={{ color: "blue" }}>
                                                 <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                                             </IconButton>
-                                        </Link>
+                                        </Link> */}
                                         <DeletePopUp id={row._id} page={page} actionToDispatch={deleteReview} />
                                     </TableCell>
                                 </TableRow>
