@@ -5,7 +5,7 @@ const { isSuperAdmin, calculateAverageRating } = require("../utils/utils");
 const { verifyuser } = require("../utils/middlewares");
 
 const router = express.Router();
-router.use(verifyuser)
+// router.use(verifyuser)
 
 
 // Adding review

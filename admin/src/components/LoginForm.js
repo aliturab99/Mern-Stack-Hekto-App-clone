@@ -4,7 +4,7 @@ import { Link, NavLink } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { signin } from "../store/actions/authActions";
-import { showError } from "../store/actions/alertActions";
+import { showError, showSuccess } from "../store/actions/alertActions";
 
 
 
@@ -15,6 +15,7 @@ const LoginForm = () => {
     axios.post("api/users/login", data).then(({ data }) => {
       dispatch(signin(data.user, data.token))
       localStorage.setItem("token", data.token)
+      dispatch(showSuccess("Signed in successfully"))
     }).catch(err => {
       let message = err && err.response && err.response.data ? err.response.data.error : err.message
       dispatch(showError(message))

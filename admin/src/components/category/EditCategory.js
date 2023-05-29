@@ -39,7 +39,7 @@ function EditCategory({ categories }) {
         try {
             data.id = id;
             let result = await axios.post(
-                `/categories/edit`,
+                `/api/categories/edit`,
                 data
             );
 

@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const { createJWTToken, isSuperAdmin } = require('../utils/utils');
 const { checkSchema, validationResult } = require('express-validator');
 const User = require("../models/User")
-const {verifyuser} = require("../utils/middlewares")
+const { verifyuser } = require("../utils/middlewares")
 const { randomBytes } = require('crypto');
 const { default: axios } = require('axios');
 
@@ -14,12 +14,15 @@ router.use(['/profile-settings', '/add', '/edit', '/delete', "/profile"], verify
 
 router.post("/login", async (req, res) => {
   try {
-    console.log(req.body)
+
     if (!req.body.email)
       throw new Error("Email is required");
+
     if (!req.body.password)
       throw new Error("Password is required");
+
     let user = await User.findOne({ email: req.body.email });
+    
     if (!user)
       throw new Error("Email or password is incorrect");
 
@@ -33,8 +36,6 @@ router.post("/login", async (req, res) => {
     const token = await createJWTToken(user, 5000);
     res.json({ user, token });
   } catch (error) {
-    console.log(req.body)
-
     if (error.name === "ValidationError") {
       let errors = {};
 
@@ -47,15 +48,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/forgot-password", async(req, res) => {
-  
-  try{
-    if(!req.body.email)
+router.post("/forgot-password", async (req, res) => {
+
+  try {
+    if (!req.body.email)
       throw new Error("User email is required")
-    let user = await User.findOne({email: req.body.email})
-    if(!user)
+    let user = await User.findOne({ email: req.body.email })
+    if (!user)
       throw new Error("Invalid Request")
-    const password_reset_code = user._id.toString() + randomBytes(Math.ceil(25/2)).toString('hex').slice(0, 25);
+    const password_reset_code = user._id.toString() + randomBytes(Math.ceil(25 / 2)).toString('hex').slice(0, 25);
     await User.findByIdAndUpdate(user._id, { password_reset_code });
     const resetPasswordUrl = process.env.BASE_URL + "admin/reset-password/" + password_reset_code;
 
@@ -73,16 +74,16 @@ router.post("/forgot-password", async(req, res) => {
     //     from: process.env.EMAIL_FROM
     //   }
     // }
-    
+
     // const response = await axios.post('https://api.elasticemail.com/v4/emails/transactional', data, {
     //   headers: { 'X-ElasticEmail-ApiKey': process.env.EMAIL_API_KEY }
     // })
     // console.log(response)
-    
+
     res.json({ success: true });
 
 
-  }catch(error){
+  } catch (error) {
     res.status(400).json({ error: error.message });
   }
 })
@@ -94,7 +95,7 @@ router.post("/verify-reset-code", async (req, res) => {
     let user = await User.findOne({ password_reset_code: req.body.code });
     if (!user) throw new Error("Invalid request");
 
-    user = user.toObject(); 
+    user = user.toObject();
     delete user.password;
 
     res.json({ user });
@@ -111,10 +112,10 @@ router.post("/reset-password", async (req, res) => {
     if (!req.body.newPassword) throw new Error("New password is required");
     if (!req.body.confirmPassword) throw new Error("Confirm password is required");
 
-    if(req.body.newPassword.length < 6)
+    if (req.body.newPassword.length < 6)
       throw new Error("Password should have at least 6 characters");
 
-    if(req.body.newPassword !== req.body.confirmPassword)
+    if (req.body.newPassword !== req.body.confirmPassword)
       throw new Error("Passwords are not same");
 
     let user = await User.findOne({ password_reset_code: req.body.code });
@@ -140,21 +141,21 @@ router.post("/profile-settings", async (req, res) => {
 
     if (!mongoose.isValidObjectId(req.body.id))
       throw new Error("User id is invalid");
-      
-      let user = await User.findById(req.body.id);
-      if (!user) throw new Error("User does not exists");
 
-      await User.findByIdAndUpdate(req.body.id, {
-        name: req.body.name,
-        email: req.body.email,
-        phone_number: req.body.phone_number,
-        type: req.body.type
-      });
-      let updatedUser = await User.findById(req.body.id)
-      updatedUser.toObject()
-      delete updatedUser.password
-      
-      res.json({ user: updatedUser });
+    let user = await User.findById(req.body.id);
+    if (!user) throw new Error("User does not exists");
+
+    await User.findByIdAndUpdate(req.body.id, {
+      name: req.body.name,
+      email: req.body.email,
+      phone_number: req.body.phone_number,
+      type: req.body.type
+    });
+    let updatedUser = await User.findById(req.body.id)
+    updatedUser.toObject()
+    delete updatedUser.password
+
+    res.json({ user: updatedUser });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -242,7 +243,7 @@ router.post("/edit", async (req, res) => {
   try {
     // if( isSuperAdmin(req.user) )
     //   throw new Error("Invalid Request")
-    
+
     if (!req.body.id) throw new Error("User id is required");
     if (!mongoose.isValidObjectId(req.body.id))
       throw new Error("User id is invalid");
@@ -267,14 +268,14 @@ router.post("/edit", async (req, res) => {
 
 
 
-router.get("/profile", async(req, res) =>{
-  try{
+router.get("/profile", async (req, res) => {
+  try {
     let user = await User.findById(req.user._id)
     user = user.toObject()
     delete user.password
-    res.json({user});
-  }catch(err){
-     res.status(400).json({ error: err.message })
+    res.json({ user });
+  } catch (err) {
+    res.status(400).json({ error: err.message })
   }
 })
 
@@ -284,7 +285,7 @@ router.delete("/delete", async (req, res) => {
   try {
     // if( isSuperAdmin(req.user) )
     //   throw new Error("Invalid Request")
-    
+
     if (!req.body.id)
       throw new Error("Invalid request");
     if (!mongoose.isValidObjectId(req.body.id))
@@ -309,7 +310,7 @@ router.get("/", async (req, res) => {
     // const users = await User.find({}, null, { skip, limit: parseInt(recordsPerPage), sort: { created_on: -1 } });
     const users = await User.find({}, null, { skip, limit: parseInt(recordsPerPage) });
 
-    res.status(200).json({users, totalRecords});
+    res.status(200).json({ users, totalRecords });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
