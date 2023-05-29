@@ -55,7 +55,7 @@ function EditUser({ users }) {
             });
             dispatch({ type: userActionTypes.EDIT_USER, payload: { user: result.data.user, userIndex } })
             dispatch(showSuccess("User updated successfully"))
-            navigate(`/admin/dashboard/users/${rows}/${page}`);
+            navigate(`/admin/users/${rows}/${page}`);
             // Navigation will be added there
         } catch (error) {
             if (error.response && error.response.status === 400) {

@@ -101,19 +101,24 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const drodownsList = [
   {
-    title: 'Products',
-    icon: <ListIcon />,
-    items: [{ to: '/admin/dashboard/products/add', text: 'Add Product', icon: <AddCircleOutline /> }, { to: '/admin/dashboard/products/', text: 'Product', icon: <Inventory2Icon /> }]
-  },
-  {
     title: 'Categories',
     icon: <CategoryIcon />,
-    items: [{ to: '/admin/dashboard/categories/add', text: 'Add Category', icon: <AddCircleOutline /> }, { to: '/admin/dashboard/categories/', text: 'Categories', icon: <Inventory2Icon /> }]
+    items: [{ to: '/admin/categories/add', text: 'Add Category', icon: <AddCircleOutline /> }, { to: '/admin/categories/', text: 'Categories', icon: <Inventory2Icon /> }]
+  },
+  {
+    title: 'Brands',
+    icon: <CategoryIcon />,
+    items: [{ to: '/admin/brands/add', text: 'Add Brand', icon: <AddCircleOutline /> }, { to: '/admin/brands/', text: 'Brands', icon: <Inventory2Icon /> }]
+  },
+  {
+    title: 'Products',
+    icon: <PeopleOutline />,
+    items: [{ to: '/admin/products/add', text: 'Add Product', icon: <AddCircleOutline /> }, { to: '/admin/products', text: 'Products', icon: <Inventory2Icon /> }]
   },
   {
     title: 'Users',
     icon: <ListIcon />,
-    items: [{ to: '/admin/dashboard/users/add', text: 'Add user', icon: <AddCircleOutline /> }, { to: '/admin/dashboard/users/', text: 'Users', icon: <GroupIcon /> }]
+    items: [{ to: '/admin/users/add', text: 'Add user', icon: <AddCircleOutline /> }, { to: '/admin/users', text: 'Users', icon: <GroupIcon /> }]
   }
 ];
 
@@ -185,7 +190,7 @@ function Sidebar({progressBar, dispatch}) {
         <Divider />
         <List>
           <Link
-            to="/admin/dashboard/settings"
+            to="/admin/settings"
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <ListItem key={"configuration"} disablePadding>

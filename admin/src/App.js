@@ -22,20 +22,20 @@ function App({ user, isAuthLoaded, loadAuth, signOut }) {
 
   },[])
   
-  if(!isAuthLoaded)
-  return <AppPreLoader message="Loading..." />
+  if (!isAuthLoaded)
+    return <AppPreLoader message="Loading..." />
 
   if (user && publicRoutes.find(url => pathname.startsWith(url)))
-    return <Navigate to='/admin/dashboard/' />
+    return <Navigate to='/admin/' />
 
-    if (!user && !publicRoutes.find(url => pathname.startsWith(url)))
+  if (!user && !publicRoutes.find(url => pathname.startsWith(url)))
     return <Navigate to='/admin/signin' />
 
 
   if (pathname === '/' || pathname === '/admin')
-  return <Navigate to='/admin/signin' />
+    return <Navigate to='/admin/signin' />
 
-  if(!user)
+  if (!user)
     return <AppPublic />
 
   return (

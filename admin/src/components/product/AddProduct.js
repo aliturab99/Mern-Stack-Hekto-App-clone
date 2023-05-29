@@ -14,6 +14,7 @@ import TextAreaInput from '../library/TextAreaInput'
 import TextInput from '../library/TextInput'
 import CheckBoxInput from '../library/CheckBoxInput'
 import { loadAllCategories } from '../../store/actions/categoryActions'
+import { loadAllBrands } from '../../store/actions/brandsActions.js'
 
 function AddProduct( {  categories, brands } ) {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ function AddProduct( {  categories, brands } ) {
 
     useEffect(() => {
         dispatch(loadAllCategories())
-        // dispatch(loadAllBrands())
+        dispatch(loadAllBrands())
     }, [])
 
     const validate = (data) => {
@@ -54,7 +55,7 @@ function AddProduct( {  categories, brands } ) {
             });
             dispatch({ type: productActionTypes.ADD_PRODUCT, payload: result.data.product })
             dispatch(showSuccess("Product added successfully"))
-            navigate("/admin/dashboard/products");
+            navigate("/admin/products");
         } catch (error) {
             if (error.response && error.response.status === 400) {
                 return { [FORM_ERROR]: error.response.data.errors };
@@ -100,14 +101,14 @@ function AddProduct( {  categories, brands } ) {
                             }
                             />
 
-                        {/* <Field
+                        <Field
                             component={SelectInput}
                             name="brandId"
                             label="Select brand"
                             options={
                                 brands && brands.map(brand => ({ label: brand.name, value: brand._id }))
                             }
-                            /> */}
+                            />
 
                         <Field component={CheckBoxInput} name="isFeatured" label="Featured" />
                         <Field component={CheckBoxInput} name="isTrending" label="Trending" />
@@ -154,7 +155,7 @@ const mapStateToProps = state => {
     console.log(state.categories.categories)
     return {
         categories: state.categories.allCategories,
-        // brands: state.brands.allBrands,
+        brands: state.brands.allBrands,
     }
 }
 

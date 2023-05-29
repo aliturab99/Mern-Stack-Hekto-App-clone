@@ -46,7 +46,7 @@ function AddUser() {
             });
             dispatch({ type: userActionTypes.ADD_USER, payload: result.data.user })
             dispatch(showSuccess("User added successfully"))
-            navigate("/admin/dashboard/users");
+            navigate("/admin/users");
         } catch (error) {
             if (error.response && error.response.status === 400) {
                 return { [FORM_ERROR]: error.response.data.errors };
