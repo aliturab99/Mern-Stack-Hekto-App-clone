@@ -6,6 +6,8 @@ const initState = {
     token: null,
     isLogined: false,
     userType: null,
+    configuration: null,
+    dashboard: null
 }
 
 
@@ -27,8 +29,9 @@ const authReducer = (state = initState, action) => {
         case authActionsType.AUTH_LOADED:
             return {
                 ...state,
-                user: action.user,
-                userType: action.user.type,
+                user: action.payload.user,
+                userType: action.payload.user.type,
+                configuration: action.payload.configuration,
                 isLogined: true
             }
         case authActionsType.AUTH_FAILED:
@@ -41,9 +44,24 @@ const authReducer = (state = initState, action) => {
                 userType: null,
             }
         case authActionsType.AUTH_UPDATED:
-            return{
+            return {
                 ...state,
                 user: action.user
+            }
+        case authActionsType.UPDATE_USER:
+            return {
+                ...state,
+                user: action.payload
+            }
+        case authActionsType.DASHBAORD_DATA_LOADED:
+            return {
+                ...state,
+                dashboard: action.payload
+            }
+        case authActionsType.UPDATE_CONFIGURATION:
+            return {
+                ...state,
+                configuration: action.payload
             }
         default:
             return state
