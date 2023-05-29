@@ -182,7 +182,7 @@ function Users({ users, totalRecords, paginationArray, dispatch }) {
                     }
                   </TableCell>
                   <TableCell sx={{ display: "flex" }}>
-                    <Link to={"/admin/dashboard/users/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
+                    <Link to={"/admin/users/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
                       <IconButton sx={{ color: "blue" }}>
                         <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                       </IconButton>

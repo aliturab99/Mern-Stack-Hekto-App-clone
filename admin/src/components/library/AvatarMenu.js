@@ -54,7 +54,7 @@ function AvatarMenu({user}) {
           <Button>
             <NavLink
               style={{ "textDecoration": "none", "color": "#000" }}
-              to={"/admin/dashboard/users/profile"}
+              to={"/admin/users/profile"}
               onClick={handleClose}
             >
               Profile Settings

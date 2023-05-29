@@ -12,6 +12,9 @@ import Products from './components/product/Products';
 import AddUser from './components/user/AddUser';
 import EditUser from './components/user/EditUser';
 import Users from './components/user/Users';
+import Brands from './components/brands/Brands';
+import AddBrand from './components/brands/AddBrand';
+import EditBrand from './components/brands/EditBrand';
 
 function AppRoutes() {
 
@@ -25,29 +28,35 @@ function AppRoutes() {
 
     return (
         <Routes>
-                <Route path="/admin/dashboard" element={<Template />}>
+                <Route path="/admin/" element={<Template />}>
 
 
                 {/* Users Routes */}
-                <Route path="/admin/dashboard/users/add" element={<AddUser />} />
-                <Route path="/admin/dashboard/users" element={<Users />} />
-                <Route path="/admin/dashboard/users/profile" element={<Profile />} />
-                <Route path="/admin/dashboard/users/edit/:id/:rows/:page/" element={<EditUser />} />
-                <Route path="/admin/dashboard/users/:recordsPerPage/:pageNumber/" element={<Users />} />
+                <Route path="users/add" element={<AddUser />} />
+                <Route path="users" element={<Users />} />
+                <Route path="users/profile" element={<Profile />} />
+                <Route path="users/edit/:id/:rows/:page/" element={<EditUser />} />
+                <Route path="users/:recordsPerPage/:pageNumber/" element={<Users />} />
                 
                 
                 {/* Products Routes */}
-                <Route path="/admin/dashboard/products" element={<Products />} />
-                <Route path="/admin/dashboard/products/add" element={<AddProduct />} />
-                <Route path="/admin/dashboard/products/edit/:id/:rows/:page/" element={<EditProduct />} />
-                <Route path="/admin/dashboard/products/:recordsPerPage/:pageNumber/" element={<Products />} />
+                <Route path="products" element={<Products />} />
+                <Route path="products/add" element={<AddProduct />} />
+                <Route path="products/edit/:id/:rows/:page/" element={<EditProduct />} />
+                <Route path="products/:recordsPerPage/:pageNumber/" element={<Products />} />
 
                 {/* Categories Routes */}
-                <Route path="/admin/dashboard/categories" element={<Categories />} />
-                <Route path="/admin/dashboard/categories/add" element={<AddCategory />} />
-                <Route path="/admin/dashboard/categories/edit/:id/:rows/:page/" element={<EditCategory />} />
-                <Route path="/admin/dashboard/categories/:recordsPerPage/:pageNumber/" element={<Categories />} />
-                <Route path='/admin/dashboard/settings' element={<Configurations />} />
+                <Route path="categories" element={<Categories />} />
+                <Route path="categories/add" element={<AddCategory />} />
+                <Route path="categories/edit/:id/:rows/:page/" element={<EditCategory />} />
+                <Route path="categories/:recordsPerPage/:pageNumber/" element={<Categories />} />
+                <Route path='settings' element={<Configurations />} />
+
+                {/* Brands Routes */}
+                <Route path="brands" element={<Brands />} />
+                <Route path="brands/add" element={<AddBrand />} />
+                <Route path="brands/edit/:id/:rows/:page/" element={<EditBrand />} />
+                <Route path="brands/:recordsPerPage/:pageNumber/" element={<Brands />} />
             </Route>
 
         </Routes>
