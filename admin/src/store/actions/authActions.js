@@ -45,7 +45,6 @@ export const loadAuth = () => {
 
     axios.get('/api/users/profile').then(result => {
       axios.get("/api/store").then(({ data }) => {
-        console.log("Configurations", data)
         dispatch({ type: authActionsType.AUTH_LOADED, payload: { user: result.data.user, configuration: data } });
         dispatch({ type: authActionsType.DASHBAORD_DATA_LOADED, payload: { totalUsers: data.totalUsers, totalCategories: data.totalCategories, totalBrands: data.totalBrands, totalProducts: data.totalProducts } })
       })

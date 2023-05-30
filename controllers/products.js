@@ -6,7 +6,8 @@ const multer = require('multer');
 const fs = require('fs').promises;
 const fse = require('fs-extra');
 const path = require('path');
-const { verifyuser } = require("../utils/middlewares");
+const Category = require("../models/Category");
+const {verifyuser} = require('../utils/middlewares')
 
 const router = express.Router();
 router.use(verifyuser)
@@ -38,7 +39,7 @@ router.post("/add", upload.array('productPictures[]'), async (req, res) => {
         shortDescription: req.body.shortDescription,
         price: req.body.price,
         sale_price: req.body.sale_price,
-        discountPrice: req.body.discountPrice,
+        discountPercentage: req.body.discountPercentage,
         categoryId: req.body.categoryId,
         brandId: req.body.brandId,
         color: req.body.color,
@@ -50,13 +51,14 @@ router.post("/add", upload.array('productPictures[]'), async (req, res) => {
         additionalInformation: req.body.additionalInformation,
     }
 
-
+    if (req.body.discountPercentage)
+        record.discountPrice = (req.body.sale_price - (req.body.sale_price * (req.body.discountPercentage / 100))).toFixed(2);
 
     try {
-        // if(isSuperAdmin(req.user) || isAdmin(req.user))
-        //     throw new Error("Invalid Request")
+        if (isSuperAdmin(req.user) && isAdmin(req.user))
+            throw new Error("Invalid Requests")
 
-        const product = new Product(record);
+        let product = new Product(record);
 
         await product.save()
 
@@ -81,6 +83,11 @@ router.post("/add", upload.array('productPictures[]'), async (req, res) => {
             await Product.findByIdAndUpdate(req.body.id, { productPictures: productPicturesArr });
         }
 
+        const category = await Category.findOne({ _id: req.body.categoryId });
+        product = {
+            ...product.toObject(),
+            categoryName: category.name
+        };
 
         res.status(200).json({ product })
     } catch (error) {
@@ -111,7 +118,7 @@ router.post("/edit", upload.array('productPictures[]'), async (req, res) => {
             shortDescription: req.body.shortDescription,
             price: req.body.price,
             sale_price: req.body.sale_price,
-            discountPrice: req.body.discountPrice,
+            discountPercentage: req.body.discountPercentage,
             categoryId: req.body.categoryId,
             brandId: req.body.brandId,
             color: req.body.color,
@@ -122,6 +129,8 @@ router.post("/edit", upload.array('productPictures[]'), async (req, res) => {
             longDescription: req.body.longDescription,
             additionalInformation: req.body.additionalInformation,
         }
+        if (req.body.discountPercentage)
+            record.discountPrice = (req.body.sale_price - (req.body.sale_price * (req.body.discountPercentage / 100))).toFixed(2);
 
         let productPicturesArr = [];
         if (req.files && req.files.length > 0) {
@@ -151,7 +160,16 @@ router.post("/edit", upload.array('productPictures[]'), async (req, res) => {
 
         await Product.findByIdAndUpdate(req.body.id, record);
 
-        res.json({ product: await Product.findById(req.body.id) })
+        let updatedProduct = await Product.findById(req.body.id);
+        const category = await Category.findOne({ _id: req.body.categoryId });
+
+
+        const responseObj = {
+            ...updatedProduct.toObject(),
+            categoryName: category.name
+        };
+
+        res.json({ product: responseObj })
 
     } catch (err) {
         res.status(400).json({ error: err.message })
@@ -191,6 +209,9 @@ router.delete('/delete', async (req, res) => {
 //Getting Products
 router.get("/", async (req, res) => {
     try {
+        if (isSuperAdmin(req.user) && isAdmin(req.user))
+            throw new Error("Invalid Request")
+
         const skip = parseInt(req.query.skip ? req.query.skip : 0);
         const recordsPerPage = req.query.limit ? req.query.limit : process.env.RECORDS_PER_PAGE;
 
@@ -218,10 +239,18 @@ router.get("/", async (req, res) => {
                     name: 1,
                     price: 1,
                     sale_price: 1,
+                    discountPrice: 1,
                     averageRating: 1,
                     categoryId: 1,
                     active: 1,
                     created_on: 1,
+                    shortDescription: 1,
+                    longDescription: 1,
+                    additionalInformation: 1,
+                    tags: 1,
+                    isFeatured: 1,
+                    isTop: 1,
+                    isTrending: 1,
                     categoryName: "$category.name" // Retrieve the category name field
                 }
             }

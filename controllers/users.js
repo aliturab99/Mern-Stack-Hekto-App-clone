@@ -1,33 +1,54 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
-const { createJWTToken, isSuperAdmin } = require('../utils/utils');
+const { createJWTToken } = require('../utils/utils');
 const { checkSchema, validationResult } = require('express-validator');
 const User = require("../models/User")
 const { verifyuser } = require("../utils/middlewares")
 const { randomBytes } = require('crypto');
-const { default: axios } = require('axios');
-const multer = require("multer");
+const multer = require('multer');
 const fs = require('fs').promises;
+const path = require('path');
 const fse = require('fs-extra');
-const path = require('path')
-
-
 
 const router = express.Router();
 router.use(['/profile-update', '/add', '/edit', '/delete', "/profile"], verifyuser);
 
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+      await fs.mkdir(`content/${req.user._id}/`, { recursive: true });
+      cb(null, `content/${req.user._id}/`);
+    } catch (err) {
+      cb(err, null);
+    }
+
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
+})
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['jpg', 'png', 'gif', 'bmp', 'jpeg'];
+    const ext = path.extname(file.originalname).replace('.', '');
+    if (allowedTypes.includes(ext))
+      cb(null, true);
+    else {
+      cb(new Error("File type is not allowed"), false);
+    }
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
-
     if (!req.body.email)
       throw new Error("Email is required");
-
     if (!req.body.password)
       throw new Error("Password is required");
-
-    let user = await User.findOne({ email: req.body.email });
-    
+    let user = await User.findOne({ email: { $regex: new RegExp(req.body.email, "i") } });
     if (!user)
       throw new Error("Email or password is incorrect");
 
@@ -41,6 +62,7 @@ router.post("/login", async (req, res) => {
     const token = await createJWTToken(user, 5000);
     res.json({ user, token });
   } catch (error) {
+
     if (error.name === "ValidationError") {
       let errors = {};
 
@@ -65,25 +87,24 @@ router.post("/forgot-password", async (req, res) => {
     await User.findByIdAndUpdate(user._id, { password_reset_code });
     const resetPasswordUrl = process.env.BASE_URL + "admin/reset-password/" + password_reset_code;
 
-    // const data = {
-    //   Recipients: {
-    //     To: [user.email]
-    //   },
-    //   Content: {
-    //     Body: [{
-    //       ContentType: 'HTML',
-    //       Content: await ejs.renderFile('./emails/resetPassword.ejs', { name: user.name, resetPasswordUrl } ),
-    //       Charset: "utf8"
-    //     }],
-    //     subject: "Reset Password",
-    //     from: process.env.EMAIL_FROM
-    //   }
-    // }
+    const data = {
+      Recipients: {
+        To: [user.email]
+      },
+      Content: {
+        Body: [{
+          ContentType: 'HTML',
+          Content: await ejs.renderFile('./emails/resetPassword.ejs', { name: user.name, resetPasswordUrl }),
+          Charset: "utf8"
+        }],
+        subject: "Reset Password",
+        from: process.env.EMAIL_FROM
+      }
+    }
 
     // const response = await axios.post('https://api.elasticemail.com/v4/emails/transactional', data, {
     //   headers: { 'X-ElasticEmail-ApiKey': process.env.EMAIL_API_KEY }
     // })
-    // console.log(response)
 
     res.json({ success: true });
 
@@ -139,34 +160,6 @@ router.post("/reset-password", async (req, res) => {
 });
 
 
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    try {
-      await fs.mkdir(`content/${req.user._id}/`, { recursive: true });
-      cb(null, `content/${req.user._id}/`);
-    } catch (err) {
-      cb(err, null);
-    }
-
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
-})
-
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['jpg', 'png', 'gif', 'bmp', 'jpeg'];
-    const ext = path.extname(file.originalname).replace('.', '');
-    if (allowedTypes.includes(ext))
-      cb(null, true);
-    else {
-      cb(new Error("File type is not allowed"), false);
-    }
-  }
-});
-
 router.post("/profile-update", upload.single('profile_picture'), async (req, res) => {
 
   try {
@@ -210,7 +203,6 @@ router.post("/profile-update", upload.single('profile_picture'), async (req, res
   }
 
 });
-
 
 
 const userSchema = checkSchema({
