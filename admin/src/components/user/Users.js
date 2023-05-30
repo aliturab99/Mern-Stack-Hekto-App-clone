@@ -102,12 +102,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function Users({ users, totalRecords, paginationArray, dispatch }) {
+function Users({ users, totalRecords, paginationArray, stateRowsPerPage, dispatch }) {
   const { recordsPerPage, pageNumber } = useParams(); // while coming back from Edit item
 
   const [page, setPage] = useState(pageNumber ? parseInt(pageNumber) : 0);
-  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(process.env.REACT_APP_RECORDS_PER_PAGE));
-  const classes = useStyles();
+  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(stateRowsPerPage));  const classes = useStyles();
 
   const totalPages = useMemo(() => Math.ceil(totalRecords / rowsPerPage), [users, rowsPerPage]);
 
@@ -155,6 +154,7 @@ function Users({ users, totalRecords, paginationArray, dispatch }) {
             </TableHead>
             <TableBody>
               {visibleRows.map((row) => {
+                if (!row) return;
                 if(row.is_deleted) return;
                 return <TableRow key={row._id} className={classes.headerRow}>
                   <TableCell>{row.name}</TableCell>
@@ -230,6 +230,7 @@ const mapStateToProps = state => {
     totalRecords: state.users.totalRecords,
     loadingRecords: state.progressBar.loading,
     paginationArray: state.users.paginationArray,
+    stateRowsPerPage: state.brands.rowsPerPage
   }
 }
 

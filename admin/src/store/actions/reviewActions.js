@@ -28,7 +28,7 @@ export const loadReviews = (currentPage = 1, recordsPerPage = process.env.REACT_
 
         skipRecords = (parseInt(currentPage)) * parseInt(recordsPerPage);
 
-        axios.get('/api/reviews', { params: { skip: skipRecords, limit: recordsPerPage, productId } }).then(({ data }) => {
+        axios.get('/reviews', { params: { skip: skipRecords, limit: recordsPerPage, productId } }).then(({ data }) => {
             const state = getState();
             if (state.reviews.reviews.length === 0)
                 dispatch(hideProgressBar());

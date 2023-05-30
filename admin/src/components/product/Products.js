@@ -10,9 +10,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faStar } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 import { deleteProduct, loadProducts, productActionTypes } from '../../store/actions/productActions';
-import { loadCategories } from '../../store/actions/categoryActions';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
+import { reviewActionTypes } from '../../store/actions/reviewActions';
 
 
 const columns = [
@@ -103,11 +103,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function Products({ products, totalRecords, paginationArray, categories, dispatch }) {
+function Products({ products, totalRecords, paginationArray, stateRowsPerPage, dispatch }) {
   const { recordsPerPage, pageNumber } = useParams(); // while coming back from Edit item
 
   const [page, setPage] = useState(pageNumber ? parseInt(pageNumber) : 0);
-  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(process.env.REACT_APP_RECORDS_PER_PAGE));
+  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage ? parseInt(recordsPerPage) : parseInt(stateRowsPerPage));
   const classes = useStyles();
 
   const totalPages = useMemo(() => Math.ceil(totalRecords / rowsPerPage), [products, rowsPerPage]);
@@ -143,7 +143,7 @@ function Products({ products, totalRecords, paginationArray, categories, dispatc
   }, [products, page, rowsPerPage]);
 
   const handleReviewsPage = (url) => {
-    // dispatch({ type: reviewActionTypes.RESET_REVIEW })
+    dispatch({ type: reviewActionTypes.RESET_REVIEW })
     navigate(url)
   }
 
@@ -154,6 +154,7 @@ function Products({ products, totalRecords, paginationArray, categories, dispatc
     else
       setPage(0);
   }
+
 
   return (
     <Grid container>
@@ -178,20 +179,14 @@ function Products({ products, totalRecords, paginationArray, categories, dispatc
             </TableHead>
             <TableBody>
               {visibleRows.map((row) => {
+                if (!row) return;
                 if (row.is_deleted) return;
                 return <TableRow key={row._id} className={classes.headerRow}>
                   <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.price}</TableCell>
                   <TableCell>{row.sale_price}</TableCell>
+                  <TableCell>{row.discountPrice}</TableCell>
                   <TableCell><Rating value={row.averageRating} precision={0.5} readOnly /></TableCell>
-                  <TableCell>
-                    {
-                      categories && categories.map(category => {
-                        if (row.categoryId == category._id)
-                          return <Chip size='small' label={category.name} color="info" />
-                      })
-                    }
-                  </TableCell>
+                  <TableCell><Chip size='small' label={row.categoryName} color="info" /></TableCell>
                   <TableCell>
                     {
                       row.active == process.env.REACT_APP_STATUS_ACTIVE ?
@@ -210,11 +205,7 @@ function Products({ products, totalRecords, paginationArray, categories, dispatc
                         <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
                       </IconButton>
                     </Link>
-                    <DeletePopUp
-                    id={row._id}
-                    page={page}
-                    actionToDispatch={deleteProduct}
-                    />
+                    <DeletePopUp id={row._id} page={page} actionToDispatch={deleteProduct} />
                     <IconButton sx={{ color: "#FF9529" }} onClick={() => handleReviewsPage("/admin/products/reviews/" + row._id)}>
                       <FontAwesomeIcon icon={faStar} style={{ fontSize: "1rem" }} />
                     </IconButton>
@@ -260,6 +251,8 @@ const mapStateToProps = state => {
     loadingRecords: state.progressBar.loading,
     paginationArray: state.products.paginationArray,
     categories: state.categories.categories,
+    stateRowsPerPage: state.brands.rowsPerPage
+
   }
 }
 
