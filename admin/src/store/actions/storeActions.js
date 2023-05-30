@@ -12,7 +12,6 @@ export const storeActionTypes = {
 export const loadStore = () => {
   return (dispatch, getState) => {
     axios.get('api/store').then(({ data }) => {
-        console.log(data)
       dispatch({ type: storeActionTypes.STORE_LOADED, payload: data });
     }).catch(err => {
       dispatch(hideProgressBar());

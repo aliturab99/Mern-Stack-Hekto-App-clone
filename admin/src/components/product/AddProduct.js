@@ -20,7 +20,6 @@ function AddProduct( {  categories, brands } ) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    console.log(categories)
 
     useEffect(() => {
         dispatch(loadAllCategories())
@@ -152,7 +151,6 @@ function AddProduct( {  categories, brands } ) {
 }
 
 const mapStateToProps = state => {
-    console.log(state.categories.categories)
     return {
         categories: state.categories.allCategories,
         brands: state.brands.allBrands,

@@ -30,7 +30,7 @@ function AppRoutes() {
     return (
         <Routes>
                 <Route path="/admin/" element={<Template />}>
-
+                {/* <Route index element={<Dashboard />} /> */}
 
                 {/* Users Routes */}
                 <Route path="users/add" element={<AddUser />} />
