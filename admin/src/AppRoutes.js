@@ -16,6 +16,7 @@ import Brands from './components/brands/Brands';
 import AddBrand from './components/brands/AddBrand';
 import EditBrand from './components/brands/EditBrand';
 import Reviews from './components/product/Reviews';
+import Dashboard from './components/Dashboard';
 
 function AppRoutes() {
 
@@ -30,7 +31,7 @@ function AppRoutes() {
     return (
         <Routes>
                 <Route path="/admin/" element={<Template />}>
-                {/* <Route index element={<Dashboard />} /> */}
+                <Route index element={<Dashboard />} />
 
                 {/* Users Routes */}
                 <Route path="users/add" element={<AddUser />} />
