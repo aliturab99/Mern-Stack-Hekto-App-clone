@@ -15,7 +15,6 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
 
-console.log(resetCode)
 
   useEffect( () => {
     axios.post('api/users/verify-reset-code', { code: resetCode }).then( result => {

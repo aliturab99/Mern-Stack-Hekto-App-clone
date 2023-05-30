@@ -1,23 +1,18 @@
 import { Alert, Avatar, Button, CircularProgress, Grid } from '@mui/material'
 import { Box } from '@mui/system'
 import axios from 'axios'
-import { FORM_ERROR } from 'final-form'
-import React, { useEffect } from 'react'
 import { Field, Form } from 'react-final-form'
 import { connect, useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { userActionTypes } from '../../store/actions/userActions'
-import SelectInput from '../library/SelectInput'
-import TextInput from '../library/TextInput'
 import EditIcon from '@mui/icons-material/Edit';
-import { authUpdate } from '../../store/actions/authActions'
-
+import { authUpdate, updateUser } from '../../store/actions/authActions'
+import { showError, showSuccess } from '../../store/actions/alertActions'
+import { hideProgressBar, showProgressBar } from '../../store/actions/progressActions'
+import TextInput from '../library/TextInput'
+import FileInput from '../library/FileInput'
 
 function Profile({ user, authUpdate }) {
-  const id = user._id
-  const navigate = useNavigate();
+  const id = user._id;
   const dispatch = useDispatch();
-
 
   const validate = (data) => {
     const errors = {};
@@ -26,9 +21,18 @@ function Profile({ user, authUpdate }) {
       errors.name = "name is Required";
     else if (data.name.length < 3)
       errors.name = "Name Should be more then 3 Char";
-    if (!data.email) errors.email = "Please Enter Email";
-    if (!data.phone_number) errors.phone_number = "Please Enter Phone Number";
-    if (!data.type || data.type == ' ') errors.type = "Please Select User Type";
+    if (data.newPassword) {
+      if (!data.currentPassword) errors.currentPassword = "Please enter current password";
+
+      if (data.newPassword.length < 6)
+        errors.newPassword = "Password should have at least 6 characters";
+      if (!data.confirmPassword)
+        errors.confirmPassword = "Please confirm password";
+
+      if (data.confirmPassword && data.newPassword !== data.confirmPassword)
+        errors.confirmPassword = "Passwords are not same";
+    }
+
     return errors
   };
 
@@ -36,18 +40,19 @@ function Profile({ user, authUpdate }) {
 
   const handleUpdateUser = async (data, form) => {
     try {
-      data.id = id;
-      let result = await axios.post(
-        `api/users/profile-settings`,
-        data
-      );
-      authUpdate(result.data.user)
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        return { [FORM_ERROR]: error.response.data.errors };
+      dispatch(showProgressBar())
+      let result = await axios.postForm("/api/users/profile-update", data);
+      if (result.data.user) {
+
+        dispatch( updateUser(result.data.user) );
+        dispatch(showSuccess('Profile updated successfully'))
       }
-      else
-        return { [FORM_ERROR]: error.message };
+      dispatch(hideProgressBar())
+
+    } catch (error) {
+      let message = error && error.response && error.response.data ? error.response.data.error : error.message;
+      dispatch(hideProgressBar())
+      dispatch(showError(message))
     }
 
   };
@@ -57,7 +62,6 @@ function Profile({ user, authUpdate }) {
     <Box p={5}>
       <Grid
         container
-        sx={{ "boxShadow": "0px 0px 10px 5px #ececec", "minHeight": "70vh" }}
       >
         <Grid
           item
@@ -65,14 +69,15 @@ function Profile({ user, authUpdate }) {
           style={{ "borderRight": "1px solid #ececec" }}
         >
           <Box display={"flex"} pt={5} flexDirection="column" alignItems={"center"} textAlign={"center"} justifyContent={"center"}>
-              <Avatar
-                sx={{ height: "100px", width: "100px" }}
-              >
-                {
-                  user.name.slice(0, 1)
-                }
-              </Avatar>
-              <h3>{user.name}</h3>
+            <Avatar
+              sx={{ height: "100px", width: "100px" }}
+              src={ process.env.REACT_APP_BASE_URL + `content/${id}/${user.profile_picture}` }
+            >
+              {
+                user.name.slice(0, 1)
+              }
+            </Avatar>
+            <h3>{user.name}</h3>
           </Box>
         </Grid>
         <Grid item md={8} p={2}>
@@ -85,7 +90,9 @@ function Profile({ user, authUpdate }) {
                   name: user && user.name,
                   email: user && user.email,
                   phone_number: user && user.phone_number,
-                  type: user && user.type,
+                  currentPassword: '',
+                  newPassword: '',
+                  confirmPassword: '',
                 }
               }
               render={({
@@ -97,10 +104,12 @@ function Profile({ user, authUpdate }) {
               }) => (
                 <form onSubmit={handleSubmit} method="post" encType="multipart/form-data">
                   <Field component={TextInput} type='text' name="name" placeholder="Enter Name" label="Name" />
-                  <Field component={TextInput} type='email' name="email" placeholder="User Email" label="Email" />
+                  <Field component={TextInput} type='email' name="email" placeholder="User Email" label="Email" disabled />
                   <Field component={TextInput} type='number' name="phone_number" placeholder="Phone Number" label="Phone Number" />
-                  <Field component={SelectInput} name="type" label="Type" options={[{ label: "Select user type", value: ' ' }, { label: "Super Admin", value: process.env.REACT_APP_USER_TYPE_SUPERADMIN }, { label: "Admin", value: process.env.REACT_APP_USER_TYPE_ADMIN }, { label: "Standard", value: process.env.REACT_APP_USER_TYPE_STANDARD }]} />
-
+                  <Field component={FileInput} name="profile_picture" inputProps={{ accept: "image/*" }} />
+                  <Field component={TextInput} type='password' name="currentPassword" placeholder="Enter current passowrd" />
+                  <Field component={TextInput} type='password' name="newPassword" placeholder="Enter new passowrd" />
+                  <Field component={TextInput} type='password' name="confirmPassword" placeholder="Enter confirm passowrd" />
                   {submitting ? (
                     <CircularProgress />
                   ) : (
@@ -111,30 +120,12 @@ function Profile({ user, authUpdate }) {
                       startIcon={<EditIcon />}
                       type="submit"
                       fullWidth
-                      disabled={submitting || submitting}
+                      disabled={invalid}
                     >
-                      Update Profile
+                      Update
                     </Button>
                   )}
-                  {submitError && typeof submitError === 'string' && (
-                    <Box mt={2}><Alert severity="error">{submitError}</Alert></Box>
-                  )}
 
-                  {submitError && Array.isArray(submitError) && (
-                    <Box mt={2}>
-                      {submitError.map((error, index) => (
-                        <Alert key={index} severity="error">{error}</Alert>
-                      ))}
-                    </Box>
-                  )}
-                  <Box mt={2}>
-                    {/* {error && <Alert severity="error">{error}</Alert>} */}
-                  </Box>
-                  <Box mt={2}>
-                    {submitSucceeded && !submitting && (
-                      <Alert color="success">User Added Successfully</Alert>
-                    )}
-                  </Box>
                 </form>
               )}
             />
@@ -153,4 +144,4 @@ const mapStateToProps = (state) => {
   )
 }
 
-export default connect(mapStateToProps, {authUpdate})(Profile)
+export default connect(mapStateToProps, { authUpdate })(Profile)

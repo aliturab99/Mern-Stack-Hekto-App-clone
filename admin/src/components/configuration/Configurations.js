@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FORM_ERROR } from 'final-form';
 import React, { useEffect, useState } from 'react'
 import { Field, Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { showError, showSuccess } from '../../store/actions/alertActions';
 import TextInput from '../library/TextInput';
@@ -11,7 +11,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import FileInput from '../library/FileInput';
 
 
-function Configurations() {
+function Configurations({configuration}) {
 
     const [store, setStore] = useState({});
     const navigate = useNavigate();
@@ -27,21 +27,9 @@ function Configurations() {
         return errors
     };
 
-    useEffect(() => {
-        try {
-            axios.get("/api/store/").then(({ data }) => {
-                console.log(data)
-                setStore(data)
-            })
-        } catch (err) {
-            dispatch(showError(err.response && err.response.data.message ? err.response.data.message : err.message));
-        }
-    }, [])
-
-    const handleUpdateStore = async (data, form) => {
+    const handleUpdateSite = async (data, form) => {
         try {
             axios.postForm(`/api/store/edit`, data).then(result => {
-                console.log(result)
             });
             dispatch(showSuccess("Store updated successfully"))
             // Navigation will be added there
@@ -57,18 +45,18 @@ function Configurations() {
     return (
         <Box textAlign="center" maxWidth="500px" mx="auto">
             <Form
-                onSubmit={handleUpdateStore}
+                onSubmit={handleUpdateSite}
                 // validate={validate}
                 initialValues={
                     {
-                        siteName: store.siteName,
-                        siteLogo: store.siteLogo,
-                        siteAddress: store.siteAddress,
-                        siteEmail: store.siteEmail,
-                        sitePhoneNumber: store.sitePhoneNumber,
-                        facebookLink: store.facebookLink,
-                        twitterLink: store.twitterLink,
-                        instagramLink: store.instagramLink
+                        siteName: configuration.siteName,
+                        siteLogo: configuration.siteLogo,
+                        siteAddress: configuration.siteAddress,
+                        siteEmail: configuration.siteEmail,
+                        sitePhoneNumber: configuration.sitePhoneNumber,
+                        facebookLink: configuration.facebookLink,
+                        twitterLink: configuration.twitterLink,
+                        instagramLink: configuration.instagramLink
                     }
                 }
 
@@ -128,4 +116,11 @@ function Configurations() {
     )
 }
 
-export default Configurations
+
+const mapStateToProps = state => {
+    return {
+      configuration: state.auth.configuration,
+      
+    }
+  }
+  export default connect(mapStateToProps)(Configurations);

@@ -142,7 +142,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function Sidebar({progressBar, dispatch}) {
+function Sidebar({progressBar, configuration}) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
   const classes = useStyles();
@@ -177,7 +177,7 @@ function Sidebar({progressBar, dispatch}) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" noWrap component="div">
-              Hekto Admin Panel
+              {configuration.siteName} Admin Panel
             </Typography>
           </Box>
             <AvatarMenu />
@@ -185,7 +185,7 @@ function Sidebar({progressBar, dispatch}) {
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader sx={{ justifyContent: 'center' }}>
-          {theme.direction === 'rtl' ? <img src={logo} alt="Hekto" /> : <img src={logo} alt="Hekto" />}
+          {theme.direction === 'rtl' ? <img width={50} src={process.env.REACT_APP_BASE_URL + `content/site/${configuration.siteLogo}`} alt="Hekto" /> : <img width={50} src={process.env.REACT_APP_BASE_URL + `content/site/${configuration.siteLogo}`} alt="Hekto" />}
         </DrawerHeader>
         <Divider />
         <List>
@@ -224,7 +224,9 @@ function Sidebar({progressBar, dispatch}) {
 
 const mapStateToProps = state => {
   return {
-    progressBar: state.progressBar
+    progressBar: state.progressBar,
+    configuration: state.auth.configuration,
+    
   }
 }
 
