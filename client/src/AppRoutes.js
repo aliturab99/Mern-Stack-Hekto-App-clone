@@ -22,7 +22,7 @@ function AppRoutes() {
             element: ProductsList,
         },
         {
-            path: "/details",
+            path: "/details/:productId",
             element: ProductDetails,
         },
         {
@@ -37,16 +37,7 @@ function AppRoutes() {
             path: "/order-complete",
             element: OrderCompleted
         },
-        // admin routes
-        {
-            path: '/admin',
-            element: Template,
-        },
-        {
-            path: '/admin/login',
-            element: Login,
-        },
-        
+              
     ];
 
     return (
@@ -56,10 +47,7 @@ function AppRoutes() {
                     <Route key={index} exact path={route.path} element={<route.element />} />
                 ))
             }
-            <Route path="/admin" element={<Template />}>
-                <Route path="users/add" element={<AddUser />} />
-                <Route path="users/list" element={<UsersList />} />
-            </Route>
+            
         </Routes>
     );
 

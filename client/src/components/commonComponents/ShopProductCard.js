@@ -2,8 +2,9 @@ import { themeStyles, theme } from '../../themeStyles';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import { Box, Grid, Paper, Typography, Button, Rating } from '@mui/material';
+import { Box, Grid, Paper, Typography, Button, Rating, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { addProductToCart } from '../../store/addToCartActions';
 
 
 function ShopProductCard({
@@ -32,7 +33,9 @@ function ShopProductCard({
   PaperElevation,
   priceBoxStyle,
   priceTextMargin,
-  rating
+  rating,
+  link,
+  product
 }) {
 
 
@@ -71,7 +74,7 @@ function ShopProductCard({
               position: 'relative',
               ...imageBoxStyle
             }}>
-            <Link to="details" >
+            <Link to={link} >
               <img
                 style={{
                   maxWidth: '100%',
@@ -110,7 +113,11 @@ function ShopProductCard({
               zIndex: 2,
               ...iconsStyle
             }}>
-              <AddShoppingCartIcon className="productHoverIcons" sx={{ color: '#2F1AC4', padding: '10px', '&:hover': { backgroundColor: '#EEEFFB', borderRadius: '50%', boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.05)' } }} />
+              <IconButton onClick={() => {
+                addProductToCart(product)
+              }}>
+                <AddShoppingCartIcon className="productHoverIcons" sx={{ color: '#2F1AC4', padding: '10px', '&:hover': { backgroundColor: '#EEEFFB', borderRadius: '50%', boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.05)' } }} />
+              </IconButton>
               <FavoriteBorderIcon className="productHoverIcons" sx={{ padding: '10px', color: '#2F1AC4', '&:hover': { backgroundColor: '#EEEFFB', borderRadius: '50%', boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.05)' } }} />
               <ZoomInIcon className="productHoverIcons" sx={{ padding: '10px', color: '#2F1AC4', '&:hover': { backgroundColor: '#EEEFFB', borderRadius: '50%', boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.05)' } }} />
             </Box>
@@ -123,10 +130,10 @@ function ShopProductCard({
                   <Typography className="productTitle" sx={{ ...themeStyles.productTitle, color: 'var(--off-blue)', fontSize: '16px', fontFamily: "var(--josefin)", fontWeight: "normal", marginY: "10px", ...titleStyle }}>{title}</Typography>
                   <Rating value={rating} readOnly size='small' />
                 </Box> :
-                <Typography className="productTitle" sx={{ ...themeStyles.productTitle, color: 'var(--off-blue)', fontSize: '16px', fontFamily: "var(--josefin)", fontWeight: "normal", ...titleStyle }}>{title}</Typography>  
+                <Typography className="productTitle" sx={{ ...themeStyles.productTitle, color: 'var(--off-blue)', fontSize: '16px', fontFamily: "var(--josefin)", fontWeight: "normal", ...titleStyle }}>{title}</Typography>
             }
 
-            
+
             <Box display="flex" alignItems="baseline" sx={{ ...priceBoxStyle }} flexDirection="row" justifyContent="space-between">
               <Typography className="productOtherDetails" sx={{ ...themeStyles.productPrice, fontFamily: 'var(--josefin)', marginRight: '20px', ...priceStyle }}>{price}</Typography>
               <Typography className="productOtherDetails" mt={priceTextMargin || 0} sx={{ ...themeStyles.productPrice, fontFamily: 'var(--josefin)', textDecorationLine: 'line-through', color: 'var(--pink)', fontSize: '12px', lineHeight: '14px', ...discountStyle }}>{discount}</Typography>
@@ -137,6 +144,6 @@ function ShopProductCard({
       </Box>
     </Grid>
   )
-} 
+}
 
 export default ShopProductCard

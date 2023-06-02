@@ -10,7 +10,7 @@ const Category = require("../models/Category");
 const {verifyuser} = require('../utils/middlewares')
 
 const router = express.Router();
-router.use(verifyuser)
+router.use(["/add", "/edit", '/delete'],verifyuser)
 
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
@@ -267,5 +267,10 @@ router.get("/", async (req, res) => {
     }
 });
 
+
+router.get("/dummy", async (req, res) => {
+    const products = await Product.find()
+    res.json(products)
+})
 
 module.exports = router;
