@@ -1,6 +1,6 @@
 import { Box, FormControl, Grid, InputAdornment, OutlinedInput, Typography } from '@mui/material'
 import { Container } from '@mui/system'
-import React from 'react'
+import React, { useEffect } from 'react'
 import BreadCrumbs from '../commonComponents/breadCrumb/BreadCrumbs'
 import ProductsFilters from '../commonComponents/products/ProductsFilters'
 import ProductMultiFilters from './ProductMultiFilters'
@@ -9,10 +9,12 @@ import ProductsListVertical from './ProductsListVertical'
 import SearchIcon from '@mui/icons-material/Search';
 import { themeStyles } from '../../themeStyles'
 import { useState } from 'react'
+import axios from 'axios'
 
 
 function ProductsList() {
   const [selectedProductBrandOption, setSelectedProductBrandOptions] = useState([])
+  const [products, setProducts] = useState([])
 
   const handleProductBrandFilters = (event) => {
     if (event.target.checked) {
@@ -26,8 +28,7 @@ function ProductsList() {
       setSelectedProductBrandOptions(updateSelectedProductBrandOption)
     }
   }
-
-
+  
   const [selectedDiscountedProductOption, setSelectedDiscountedProductOptions] = useState([])
 
   const handleDiscountedProductFilters = (event) => {
@@ -107,7 +108,6 @@ function ProductsList() {
 
 
 
-
   const breadCrumbs = [
     { to: 'home', label: 'Home' },
     { to: 'pages', label: 'Products' },
@@ -146,6 +146,11 @@ function ProductsList() {
     }
 
   }
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/products/dummy").then( result => 
+    setProducts(result.data)
+    )
+  }, [])
 
   return (
     <div>
@@ -154,7 +159,7 @@ function ProductsList() {
       </Container>
       <Container maxWidth={"md"} disableGutters>
         <ProductsFilters />
-        <ProductsListVertical />
+        <ProductsListVertical products={products} />
         <Grid container>
           <Grid item md={3}  >
             <ProductMultiFilters selectedOption={selectedProductBrandOption} handleFilters={handleProductBrandFilters} filterData={filterData.productBrands} />

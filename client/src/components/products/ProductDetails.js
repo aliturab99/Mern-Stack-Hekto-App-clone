@@ -6,7 +6,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 
 import thumb1 from "../../static/images/products/thumb1.png";
@@ -21,10 +21,28 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import ProductsDetailTabs from "./ProductsDetailTabs";
 import RelatedProducts from "./RelatedProducts";
+import { addProductToCart } from "../../store/addToCartActions";
+import { useParams } from "react-router-dom";
+import axios from 'axios'
+
 
 export default function ProductDetails() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [product, setProduct] = useState({})
+  const {productId} = useParams()
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/products/dummy").then( result => {
+      result.data.filter( product => {
+      if(product._id === productId) setProduct(product);
+    })}
+    )
+  }, [])
+
+  
+  const handleAddToCart = () => {
+    addProductToCart(product)
+  }
 
 
   const images = [
@@ -106,7 +124,7 @@ export default function ProductDetails() {
               flexDirection="column"
             >
               <Typography mb={3} sx={{ ...themeStyles.mainHeading }}>
-                Playwood arm chair
+                {product.name}
               </Typography>
               <Box mb={3}>
                 <Rating
@@ -123,10 +141,14 @@ export default function ProductDetails() {
               </Box>
               <Box display={"flex"} mr={"10px"}>
                 <Typography sx={{ ...themeStyles.productDetailsPrice }}>
-                  $26.00
+                  ${
+                    product.sale_price ? product.sale_price : product.price
+                  }
                 </Typography>
                 <Typography sx={{ ...themeStyles.productDetailsDiscountedPrice }}>
-                  $56.00
+                  ${
+                    product.sale_price ? product.price : ""
+                  }
                 </Typography>
               </Box>
               <Typography
@@ -139,11 +161,14 @@ export default function ProductDetails() {
                   fontWeight: "600",
                 }}
               >
-                Color
+                Color: {
+                  product.color ? product.color : "No color is available"
+                }
               </Typography>
               <Typography sx={{ ...themeStyles.productDetailsDescription }}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Magna in
-                est adipiscing in phasellus non in justo.
+                {
+                  product.shortDescription
+                }
               </Typography>
               <Box
                 display="flex"
@@ -154,16 +179,21 @@ export default function ProductDetails() {
                 <Button
                   variant="contained"
                   sx={{ ...themeStyles.productDetailsAddToCartButton }}
+                  onClick={handleAddToCart}
                 >
                   Add To Cart
                 </Button>
                 <FavoriteBorderIcon sx={{ color: "#535399" }} />
               </Box>
               <Typography mb={3} sx={{ ...themeStyles.productDetailsSubTitle }}>
-                Categories
+                {
+                  product.category ? `Category: ${product.category}` : ""
+                }
               </Typography>
               <Typography mb={3} sx={{ ...themeStyles.productDetailsSubTitle }}>
-                Tags
+                {
+                  product.tags ? `Tags: ${product.tags}`: ""
+                }
               </Typography>
               <Box display="flex" alignItems="center">
                 <Typography sx={{ ...themeStyles.productDetailsSubTitle }}>
@@ -190,7 +220,7 @@ export default function ProductDetails() {
           ...themeStyles.productDescriptionContainer,
         }}
       >
-        <ProductsDetailTabs />
+        <ProductsDetailTabs description={product.longDescription} additionalInfo={product.additionalInformation} />
       </Box>
 
       <Box
