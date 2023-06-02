@@ -11,6 +11,7 @@ function App() {
   const isAdminPanel = endpoint === "/admin" || endpoint === "/admin/" ||endpoint === "/admin/users/list" || endpoint === "/admin/users/list/" || endpoint === "/admin/users/add" || endpoint === "/admin/users/add/" || endpoint === "/admin/login" || endpoint === "/admin/login" ? true : false;
 
 
+
   return (<div className="">
     {!isAdminPanel && <Header />}
     <AppRoutes />

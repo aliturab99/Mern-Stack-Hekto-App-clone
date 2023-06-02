@@ -1,6 +1,6 @@
 import { Box, FormControl, Grid, InputAdornment, OutlinedInput, Typography } from '@mui/material'
 import { Container } from '@mui/system'
-import React from 'react'
+import React, { useEffect } from 'react'
 import BreadCrumbs from '../commonComponents/breadCrumb/BreadCrumbs'
 import ProductsFilters from '../commonComponents/products/ProductsFilters'
 import ProductMultiFilters from './ProductMultiFilters'
@@ -9,10 +9,12 @@ import ProductsListVertical from './ProductsListVertical'
 import SearchIcon from '@mui/icons-material/Search';
 import { themeStyles } from '../../themeStyles'
 import { useState } from 'react'
+import axios from 'axios'
 
 
 function ProductsList() {
   const [selectedProductBrandOption, setSelectedProductBrandOptions] = useState([])
+  const [products, setProducts] = useState([])
 
   const handleProductBrandFilters = (event) => {
     if (event.target.checked) {
@@ -26,7 +28,7 @@ function ProductsList() {
       setSelectedProductBrandOptions(updateSelectedProductBrandOption)
     }
   }
-  console.log(selectedProductBrandOption)
+  
 
   const [selectedDiscountedProductOption, setSelectedDiscountedProductOptions] = useState([])
 
@@ -42,7 +44,7 @@ function ProductsList() {
       setSelectedDiscountedProductOptions(updateSelectedDiscountedProductOption)
     }
   }
-  console.log(selectedDiscountedProductOption)
+  
 
   const [selectedCategoriesOption, setSelectedCategoriesOptions] = useState([])
 
@@ -58,7 +60,6 @@ function ProductsList() {
       setSelectedCategoriesOptions(updateSelectedCategoriesOption)
     }
   }
-  console.log(selectedCategoriesOption)
 
 
   const [selectedRatingItemOption, setSelectedRatingItemOptions] = useState([])
@@ -75,7 +76,7 @@ function ProductsList() {
       setSelectedRatingItemOptions(updateSelectedRatingItemOption)
     }
   }
-  console.log(selectedRatingItemOption)
+  
 
   const [selectedPriceOption, setSelectedPriceOptions] = useState([])
 
@@ -91,7 +92,7 @@ function ProductsList() {
       setSelectedPriceOptions(updateSelectedPriceOption)
     }
   }
-  console.log(selectedPriceOption)
+  
 
   const [selectedColorOption, setSelectedColorOptions] = useState([])
 
@@ -108,7 +109,7 @@ function ProductsList() {
     }
   }
 
-  console.log(selectedColorOption)
+  
 
 
 
@@ -151,6 +152,11 @@ function ProductsList() {
     }
 
   }
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/products/dummy").then( result => 
+    setProducts(result.data)
+    )
+  }, [])
 
   return (
     <div>
@@ -159,7 +165,7 @@ function ProductsList() {
       </Container>
       <Container maxWidth={"md"} disableGutters>
         <ProductsFilters />
-        <ProductsListVertical />
+        <ProductsListVertical products={products} />
         <Grid container>
           <Grid item md={3}  >
             <ProductMultiFilters selectedOption={selectedProductBrandOption} handleFilters={handleProductBrandFilters} filterData={filterData.productBrands} />
