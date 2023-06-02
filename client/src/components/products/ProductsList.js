@@ -26,7 +26,7 @@ function ProductsList() {
       setSelectedProductBrandOptions(updateSelectedProductBrandOption)
     }
   }
-  console.log(selectedProductBrandOption)
+
 
   const [selectedDiscountedProductOption, setSelectedDiscountedProductOptions] = useState([])
 
@@ -42,7 +42,6 @@ function ProductsList() {
       setSelectedDiscountedProductOptions(updateSelectedDiscountedProductOption)
     }
   }
-  console.log(selectedDiscountedProductOption)
 
   const [selectedCategoriesOption, setSelectedCategoriesOptions] = useState([])
 
@@ -58,7 +57,6 @@ function ProductsList() {
       setSelectedCategoriesOptions(updateSelectedCategoriesOption)
     }
   }
-  console.log(selectedCategoriesOption)
 
 
   const [selectedRatingItemOption, setSelectedRatingItemOptions] = useState([])
@@ -75,7 +73,6 @@ function ProductsList() {
       setSelectedRatingItemOptions(updateSelectedRatingItemOption)
     }
   }
-  console.log(selectedRatingItemOption)
 
   const [selectedPriceOption, setSelectedPriceOptions] = useState([])
 
@@ -91,7 +88,6 @@ function ProductsList() {
       setSelectedPriceOptions(updateSelectedPriceOption)
     }
   }
-  console.log(selectedPriceOption)
 
   const [selectedColorOption, setSelectedColorOptions] = useState([])
 
@@ -108,7 +104,6 @@ function ProductsList() {
     }
   }
 
-  console.log(selectedColorOption)
 
 
 
