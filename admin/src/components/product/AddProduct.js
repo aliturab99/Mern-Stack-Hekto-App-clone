@@ -38,9 +38,10 @@ function AddProduct({ categories, brands }) {
         if (!data.shortDescription) errors.shortDescription = "Short description is required";
 
         if (data.sale_price) {
-            if (parseFloat(data.sale_price) < parseFloat(data.price))
-                errors.sale_price = "Sale price should be greated than product price"
+            if (parseFloat(data.sale_price) > parseFloat(data.price))
+                errors.sale_price = "Sale price should be smaller than product price"
         }
+        if(data.discountPercentage > 100) errors.discountPercentage = "Discount Percentage must be smaller than 100"
         return errors
     };
 
