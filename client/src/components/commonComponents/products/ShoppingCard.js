@@ -7,6 +7,7 @@ import shopingCart5 from "../../../static/images/shoppingCart/shopingCart5.png"
 import { useEffect, useState } from "react"
 import { Close } from "@mui/icons-material"
 import { deleteProduct } from "../../../store/addToCartActions"
+import { Link } from "react-router-dom"
 
 
 const ShoppingCart = () => {
@@ -58,7 +59,30 @@ const ShoppingCart = () => {
         setProducts(JSON.parse(localStorage.getItem("cartProducts")))
     }
 
+
+    const handleClearCart = () => {
+        localStorage.removeItem('cartProducts');
+        setProducts([]);
+    }
+
+    const calculateSubTotal = () => {
+        if (products) {
+          return products.reduce((total, product) => {
+            const productPrice = product.sale_price ? product.sale_price : product.price;
+            const productSubTotal = product.quantity ? productPrice * product.quantity : productPrice;
+            return total + productSubTotal;
+          }, 0);
+        }
+        return 0;
+      }
     
+      // Calculate total
+      const calculateTotal = () => {
+        const subTotal = calculateSubTotal();
+        return subTotal;
+      }
+
+
     return (
         <Container maxWidth={"md"}>
             <Grid container mt={9} mb={9} >
@@ -179,7 +203,7 @@ const ShoppingCart = () => {
                     <Grid item md={12} sx={{ 'marginTop': { xs: '20px', md: "40px" } }} >
                         <Box display={"flex"} justifyContent={"space-between"} >
                             <Button variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Update Cart</Button>
-                            <Button variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Clear Cart</Button>
+                            <Button onClick={handleClearCart} variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Clear Cart</Button>
                         </Box>
                     </Grid>
                 </Grid>
@@ -195,11 +219,11 @@ const ShoppingCart = () => {
                         <Box sx={{ "backgroundColor": "#F4F4FC" }} p={3} pb={0} >
                             <Box mb={5} display={"flex"} justifyContent={"space-around"} borderBottom={"2px solid #E8E6F1"} >
                                 <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} lineHeight={"20px"} >Subtotals :</Typography>
-                                <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} >$219.00</Typography>
+                                <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} >$ {calculateSubTotal().toFixed(2)}</Typography>
                             </Box>
                             <Box mb={5} display={"flex"} justifyContent={"space-around"} borderBottom={"2px solid #E8E6F1"} >
                                 <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} lineHeight={"20px"} >Totals :</Typography>
-                                <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} >$325.00</Typography>
+                                <Typography fontSize={"16px"} fontFamily={"var(--lato)"} color="#1D3178" fontWeight={600} >$ {calculateTotal().toFixed(2)}</Typography>
                             </Box>
                             <Box mb={4} display={"flex"} flexDirection={'column'}   >
                                 <Box mb={3} display={"flex"} alignItems={"center"} >
@@ -208,7 +232,7 @@ const ShoppingCart = () => {
                                 </Box>
                                 {/* proceed Button */}
                                 <Box display={"flex"} alignItems={"center"}  >
-                                    <Button sx={{ "backgroundColor": "#19D16F", marginBottom: "20px", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal" }} >Proceed To Checkout</Button>
+                                    <Button component={Link} to="/checkout" sx={{ "backgroundColor": "#19D16F", marginBottom: "20px", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal" }} >Proceed To Checkout</Button>
                                 </Box>
                             </Box>
 
@@ -231,7 +255,7 @@ const ShoppingCart = () => {
                             </Box>
                             <Box mt={4} display={"flex"} flexDirection={'column'}   >
                                 <Box mb={2} display={"flex"} alignItems={"center"}  >
-                                    <Button sx={{ "backgroundColor": "#19D16F", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal" }} >Proceed To Checkout</Button>
+                                    <Button  component={Link} to="/checkout"  sx={{ "backgroundColor": "#19D16F", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal" }} >Proceed To Checkout</Button>
                                 </Box>
                             </Box>
                         </Box>

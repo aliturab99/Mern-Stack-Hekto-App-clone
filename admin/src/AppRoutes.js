@@ -17,6 +17,8 @@ import AddBrand from './components/brands/AddBrand';
 import EditBrand from './components/brands/EditBrand';
 import Reviews from './components/product/Reviews';
 import Dashboard from './components/Dashboard';
+import Orders from './components/order/Orders';
+import SingleOrder from './components/order/SingleOrder';
 
 function AppRoutes() {
 
@@ -61,6 +63,11 @@ function AppRoutes() {
                 <Route path="brands/add" element={<AddBrand />} />
                 <Route path="brands/edit/:id/:rows/:page/" element={<EditBrand />} />
                 <Route path="brands/:recordsPerPage/:pageNumber/" element={<Brands />} />
+                
+                
+                {/* Orders Routes */}
+                <Route path="orders" element={<Orders />} />
+                <Route path="orders/singleOrder/:orderId/:rows/:page/" element={<SingleOrder />} />
             </Route>
 
         </Routes>

@@ -7,6 +7,7 @@ import productReducer from "./productReducer";
 import categoryReducer from "./categoryReducer";
 import brandReducer from "./brandReducer";
 import reviewReducer from "./reviewReducer";
+import orderReducer from "./orderReducer";
 
 const allReducers = {
     users: userReducer,
@@ -17,6 +18,7 @@ const allReducers = {
     categories: categoryReducer,
     brands: brandReducer,
     reviews: reviewReducer,
+
 
 }
 
