@@ -14,23 +14,20 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import logo from '../../static/logo.png'
 import { Link, Outlet } from 'react-router-dom';
 import ListIcon from "@mui/icons-material/List";
 import { AddCircleOutline, PeopleOutline } from "@mui/icons-material";
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Avatar, Button, Collapse, Grid, LinearProgress } from '@mui/material';
+import { LinearProgress } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ListDropdown from '../common/ListDropdown';
 import GroupIcon from '@mui/icons-material/Group';
 import { connect } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import SimpleSnackbar from '../library/SnackBar';
-import { showSuccess } from '../../store/actions/alertActions';
 import AvatarMenu from '../library/AvatarMenu';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import CategoryIcon from '@mui/icons-material/Category';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
 
 const drawerWidth = 240;
 
@@ -199,6 +196,19 @@ function Sidebar({progressBar, configuration}) {
                   <SettingsIcon />
                 </ListItemIcon>
                 <ListItemText primary="Configuration" />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link
+            to="/admin/orders"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <ListItem key={"orders"} disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <LocalMallIcon  />
+                </ListItemIcon>
+                <ListItemText primary="Orders" />
               </ListItemButton>
             </ListItem>
           </Link>

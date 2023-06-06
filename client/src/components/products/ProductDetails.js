@@ -33,7 +33,7 @@ export default function ProductDetails() {
   const {productId} = useParams()
   useEffect(() => {
     axios.get("http://localhost:5000/api/products/dummy").then( result => {
-      result.data.filter( product => {
+      result.data.filter( (product, index) => {
       if(product._id === productId) setProduct(product);
     })}
     )
@@ -98,6 +98,7 @@ export default function ProductDetails() {
                 >
                   {images.map((image, index) => (
                     <img
+                    key={index}
                       src={image.url}
                       alt={image.title}
                       style={{ maxWidth: "100%", height: "auto" }}

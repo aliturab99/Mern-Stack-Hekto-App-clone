@@ -87,20 +87,20 @@ router.post("/forgot-password", async (req, res) => {
     await User.findByIdAndUpdate(user._id, { password_reset_code });
     const resetPasswordUrl = process.env.BASE_URL + "admin/reset-password/" + password_reset_code;
 
-    const data = {
-      Recipients: {
-        To: [user.email]
-      },
-      Content: {
-        Body: [{
-          ContentType: 'HTML',
-          Content: await ejs.renderFile('./emails/resetPassword.ejs', { name: user.name, resetPasswordUrl }),
-          Charset: "utf8"
-        }],
-        subject: "Reset Password",
-        from: process.env.EMAIL_FROM
-      }
-    }
+    // const data = {
+    //   Recipients: {
+    //     To: [user.email]
+    //   },
+    //   Content: {
+    //     Body: [{
+    //       ContentType: 'HTML',
+    //       Content: await ejs.renderFile('./emails/resetPassword.ejs', { name: user.name, resetPasswordUrl }),
+    //       Charset: "utf8"
+    //     }],
+    //     subject: "Reset Password",
+    //     from: process.env.EMAIL_FROM
+    //   }
+    // }
 
     // const response = await axios.post('https://api.elasticemail.com/v4/emails/transactional', data, {
     //   headers: { 'X-ElasticEmail-ApiKey': process.env.EMAIL_API_KEY }

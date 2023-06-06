@@ -14,6 +14,10 @@ const ShopingCart = () => {
     { to: '/products', label: 'Products' },
   ]
 
+  const handleClearCart = () => {
+    console.log("Working")
+  }
+
   return (
     <Box>
       <Container maxWidth={'xl'} disableGutters sx={{ 'background': 'var(--bread-crumbs)' }}  >
@@ -224,7 +228,7 @@ const ShopingCart = () => {
             <Grid item md={12} sx={{ 'marginTop': { xs: '20px', md: "40px" } }} >
               <Box display={"flex"} justifyContent={"space-between"} >
                 <Button variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Update Cart</Button>
-                <Button variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Clear Cart</Button>
+                <Button onClick={handleClearCart} variant='contained' style={{ 'backgroundColor': 'var(--pink)', 'borderRadius': 0, 'padding': '6px 30px', 'fontFamily': 'Josefin Sans', 'fontSize': '16px', 'letterSpacing': '0.02em' }} >Clear Cart</Button>
               </Box>
             </Grid>
           </Grid>

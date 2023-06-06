@@ -7,10 +7,10 @@ const fs = require('fs').promises;
 const fse = require('fs-extra');
 const path = require('path');
 const Category = require("../models/Category");
-const {verifyuser} = require('../utils/middlewares')
+const { verifyuser } = require('../utils/middlewares')
 
 const router = express.Router();
-router.use(["/add", "/edit", '/delete'],verifyuser)
+router.use(["/add", "/edit", '/delete'], verifyuser)
 
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {

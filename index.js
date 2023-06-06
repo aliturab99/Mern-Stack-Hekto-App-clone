@@ -10,6 +10,7 @@ const productController = require("./controllers/products")
 const reviewController = require("./controllers/reviews")
 const siteController = require("./controllers/configurations")
 const brandController = require("./controllers/brands")
+const orderController = require("./controllers/orders")
 
 
 
@@ -26,6 +27,7 @@ app.use('/api/products', productController)
 app.use('/api/reviews', reviewController)
 app.use('/api/store', siteController)
 app.use('/api/brands', brandController)
+app.use('/api/orders', orderController)
 
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URI).then( () => {
