@@ -18,7 +18,7 @@ const allReducers = {
     categories: categoryReducer,
     brands: brandReducer,
     reviews: reviewReducer,
-
+    orders: orderReducer
 
 }
 
