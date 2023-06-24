@@ -1,6 +1,6 @@
 import { Form, Field } from "react-final-form";
 import { TextField, Button, Box, Typography } from "@mui/material";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { signin } from "../store/actions/authActions";
@@ -9,22 +9,24 @@ import { showError, showSuccess } from "../store/actions/alertActions";
 
 
 const LoginForm = () => {
+  const navigator = useNavigate()
   const dispatch = useDispatch()
 
   const handleSubmit = (data, form) => {
     axios.post("api/users/login", data).then(({ data }) => {
       dispatch(signin(data.user, data.token))
       localStorage.setItem("token", data.token)
+      navigator("/admin/")
       dispatch(showSuccess("Signed in successfully"))
+      // const fields = form.getRegisteredFields(); // Get all the registered field names
+      // fields.forEach((field) => {
+      //   form.resetFieldState(field); // Reset the touched state for each field
+      //   form.change(field, null); // Reset the value of each field to null
+      // });
     }).catch(err => {
       let message = err && err.response && err.response.data ? err.response.data.error : err.message
       dispatch(showError(message))
     })
-    const fields = form.getRegisteredFields(); // Get all the registered field names
-    fields.forEach((field) => {
-      form.resetFieldState(field); // Reset the touched state for each field
-      form.change(field, null); // Reset the value of each field to null
-    });
   };
   const handleValidation = (data) => {
     const errors = {}

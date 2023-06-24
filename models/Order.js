@@ -28,6 +28,9 @@ const orderSchema = new mongoose.Schema({
   products: {
     type: Array,
   },
+  status: {
+    type: Number
+  },
   created_on: {
     type: Date,
     default: moment().format('YYYY-MM-DD')

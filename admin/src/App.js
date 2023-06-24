@@ -33,7 +33,7 @@ function App({ user, isAuthLoaded, loadAuth, signOut }) {
 
 
   if (pathname === '/' || pathname === '/admin')
-    return <Navigate to='/admin/signin' />
+    return <Navigate to='/admin/' />
 
   if (!user)
     return <AppPublic />

@@ -21,6 +21,7 @@ const columns = [
   { id: 'firstName', label: 'First Name' },
   { id: 'lastName', label: 'Last Name' },
   { id: 'status', label: 'Status' },
+  { id: 'actions', label: 'Actions' },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -117,10 +118,10 @@ function Orders({ orders, totalRecords, paginationArray, stateRowsPerPage, dispa
   }, [orders, page, rowsPerPage]);
 
 
-   console.log(visibleRows)
+  console.log(visibleRows)
   const refreshList = () => {
     dispatch({ type: orderActionTypes.RESET_ORDER })
-    if(page === 0)
+    if (page === 0)
       dispatch(loadOrders(page, rowsPerPage))
     else
       setPage(0);
@@ -130,14 +131,18 @@ function Orders({ orders, totalRecords, paginationArray, stateRowsPerPage, dispa
     <Grid container>
       <Grid item md={12} xs={12}>
         <TableContainer component={Paper} className={classes.tableContainer}>
+          {/* Header Heading and Buttons */}
           <Box display="flex" justifyContent='space-between' m={3}>
             <Typography variant="h5">Orders</Typography>
             <Box>
               <Button sx={{ ml: 1 }} onClick={refreshList} variant="outlined" endIcon={<RefreshIcon />}>Refresh</Button>
             </Box>
           </Box>
+
+          {/* Order Table */}
           <Table aria-label="customized table">
             <TableHead>
+              {/* Table Heading Row */}
               <TableRow>
                 {
                   columns.map((column, index) => (
@@ -148,32 +153,34 @@ function Orders({ orders, totalRecords, paginationArray, stateRowsPerPage, dispa
             </TableHead>
             <TableBody>
               {visibleRows.map((row) => {
-                console.log("Visible Rows",row)
+                console.log("Visible Rows", row)
                 if (!row) return;
                 if (row.is_deleted) return;
                 return (
-                  
+
                   <TableRow key={row._id} className={classes.headerRow}>
-                  <TableCell>
-                    <Link to={"/admin/orders/singleOrder/" + row._id + "/" + rowsPerPage + "/" + page}>
-                      {row._id}
-                    </Link>
+                    <TableCell>
+                      <Link to={"/admin/orders/singleOrder/" + row._id + "/" + rowsPerPage + "/" + page}>
+                        {row._id}
+                      </Link>
                     </TableCell>
 
-                  <TableCell>{row.firstName}</TableCell>
-                  <TableCell>
-                    {
-                      row.lastName
-                    }
-                  </TableCell>
-                  <TableCell sx={{ display: "flex" }}>
-                    <Link to={"/admin/orders/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
-                      <IconButton sx={{ color: "blue" }}>
-                        <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
-                      </IconButton>
-                    </Link>
-                  </TableCell>
-                </TableRow>)
+                    <TableCell>{row.firstName}</TableCell>
+                    <TableCell>{row.lastName}</TableCell>
+                    <TableCell>
+                      {
+                        row.status === process.env.REACT_APP_ORDER_PROCESSING ?
+                        <Chip label="Processing" /> : ""
+                      }
+                    </TableCell>
+                    <TableCell sx={{ display: "flex" }}>
+                      <Link to={"/admin/orders/edit/" + row._id + "/" + rowsPerPage + "/" + page}>
+                        <IconButton sx={{ color: "blue" }}>
+                          <FontAwesomeIcon icon={faEdit} style={{ fontSize: "1rem" }} />
+                        </IconButton>
+                      </Link>
+                    </TableCell>
+                  </TableRow>)
               }
               )}
             </TableBody>
@@ -193,7 +200,6 @@ function Orders({ orders, totalRecords, paginationArray, stateRowsPerPage, dispa
               nextIconButtonProps={{
                 style: { display: "none" }
               }}
-
               style={{ height: "45px", overflow: "hidden" }}
             />
             <Box>

@@ -64,11 +64,10 @@ function SingleOrder() {
           {/* Mapping all the order products */}
           {
             singleOrder.products && singleOrder.products.map(product => {
-              console.log(product)
               return (
                 <Grid container sx={{ boxShadow: 3 }} py={3} px={2} my={1} >
                   <Grid item md={3}>
-                    <img width={"100%"} src={product.productPictures[0]} />
+                    <img width={"50%"} src={process.env.REACT_APP_BASE_URL + "content/products/" + product._id + "/" + product.productPictures[0]  } />
                   </Grid>
                   <Grid item md={9} >
                     <Box display={"flex"} justifyContent={"space-between"} >
@@ -78,6 +77,7 @@ function SingleOrder() {
                       </Box>
                       <Box>
                         <Typography variant='h6' fontWeight={600} >
+                          $
                           {product.quantity
                             ? (product.sale_product ? product.sale_product : product.price) * product.quantity
                             : (product.sale_product ? product.sale_product : product.price)}
@@ -102,7 +102,7 @@ function SingleOrder() {
               <Typography variant='h6'>
                 Payment
               </Typography>
-              <Typography variant='h6'>
+              <Typography variant='h6' fontSize={"17px"}>
                 Cash on delivery
               </Typography>
             </Grid>
@@ -116,8 +116,20 @@ function SingleOrder() {
               <Typography variant='h6'>
                 Delivery
               </Typography>
-              <Typography variant='h6'>
-                Address
+              <Typography variant='h6' fontSize={"17px"}>
+                {
+                  singleOrder.city && `City: ${singleOrder.city}`
+                }
+              </Typography>
+              <Typography variant='h6' fontSize={"17px"}>
+                {
+                  singleOrder.country && `Country: ${singleOrder.country}`
+                }
+              </Typography>
+              <Typography variant='h6' fontSize={"17px"}>
+                {
+                  singleOrder.postalCode && `Postal Code: ${singleOrder.postalCode}`
+                }
               </Typography>
             </Grid>
           </Grid>

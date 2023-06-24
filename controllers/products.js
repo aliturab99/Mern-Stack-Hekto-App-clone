@@ -15,14 +15,14 @@ router.use(["/add", "/edit", '/delete'], verifyuser)
 const storage = multer.diskStorage({
     destination: async (req, file, cb) => {
         try {
-            cb(null, `content/products/`);
+            await fs.mkdir(`content/${req.body.id}/`, { recursive: true });
+            cb(null, `content/${req.body.deptId}/`)
         } catch (err) {
-            cb(err, null);
+            cb(err, null)
         }
-
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, file.originalname)
     }
 })
 
@@ -209,8 +209,8 @@ router.delete('/delete', async (req, res) => {
 //Getting Products
 router.get("/", async (req, res) => {
     try {
-        if (isSuperAdmin(req.user) && isAdmin(req.user))
-            throw new Error("Invalid Request")
+        // if (isSuperAdmin(req.user) && isAdmin(req.user))
+        //     throw new Error("Invalid Request")
 
         const skip = parseInt(req.query.skip ? req.query.skip : 0);
         const recordsPerPage = req.query.limit ? req.query.limit : process.env.RECORDS_PER_PAGE;

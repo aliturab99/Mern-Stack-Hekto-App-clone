@@ -1,31 +1,26 @@
-import { Container, Grid, Typography, Box, Button, Checkbox, TextTextF, TextFieldield, TextFieldTextField, TextField } from "@mui/material"
-import BreadCrumbs from "../commonComponents/breadCrumb/BreadCrumbs"
-import contact1 from "../../static/images/contact/contact1.png"
-import contact2 from "../../static/images/contact/contact2.png"
-import contact3 from "../../static/images/contact/contact3.png"
-import contact4 from "../../static/images/contact/contact4.png"
-import contact5 from "../../static/images/contact/contact5.png"
-import { Link } from "react-router-dom"
-import { themeStyles } from "../../themeStyles"
-import { useEffect, useState } from "react"
-import { Field, Form } from "react-final-form"
-import TextInput from "../commonComponents/library/form/TextInput"
-import axios from "axios"
-
-
+import React, { useEffect, useState } from "react";
+import { Box, Button, Checkbox, Container, Grid, Typography } from "@mui/material";
+import { Field, Form } from "react-final-form";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import BreadCrumbs from "../commonComponents/breadCrumb/BreadCrumbs";
+import TextInput from "../commonComponents/library/form/TextInput";
+import contact1 from "../../static/images/contact/contact1.png";
+import { themeStyles } from "../../themeStyles";
 
 const CheckOutPage = () => {
-
   const breadCrumbs = [
-    { to: '/', placeholder: 'Home' },
-    { to: '/products', label: 'Products' },
-  ]
-  const [products, setProducts] = useState([])
-  const [totalPrice, setTotalPrice] = useState(0)
+    { to: "/", placeholder: "Home" },
+    { to: "/products", label: "Products" },
+  ];
+  const [products, setProducts] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const navigator = useNavigate();
 
   useEffect(() => {
-    setProducts(JSON.parse(localStorage.getItem('cartProducts')))
-  }, [])
+    const cartProducts = JSON.parse(localStorage.getItem("cartProducts"));
+    setProducts(cartProducts || []);
+  }, []);
 
   useEffect(() => {
     let total = 0;
@@ -35,39 +30,41 @@ const CheckOutPage = () => {
     setTotalPrice(total);
   }, [products]);
 
-
   const handleSubmit = (data) => {
-    axios.post("http://localhost:5000/api/orders/new", {data, products: products}).then( result => {}).catch(( err => console.log(err) ))
-  }
-
-
+    axios
+      .post("http://localhost:5000/api/orders/new", { data, products: products })
+      .then(({ data }) => {
+        if (data.success === true) navigator("/order-complete");
+      })
+      .catch((err) => console.log(err));
+    };
+    
+    const isLocalStorageEmpty = products.length === 0; // if there will be no product in the loacl storage then tis will be true
 
   return (
     <Box>
-      <Container maxWidth={'xl'} disableGutters sx={{ 'background': 'var(--bread-crumbs)' }}  >
+      <Container maxWidth={"xl"} disableGutters sx={{ background: "var(--bread-crumbs)" }}>
         <BreadCrumbs breadCrumbs={breadCrumbs} active={"Shipping"} />
       </Container>
-      <Container maxWidth={"md"} disableGutters >
+      <Container maxWidth={"md"} disableGutters>
         <Form
           onSubmit={handleSubmit}
           validate={(data) => {
-            const errors = {}
-
-            if(!data.contact) errors.contact = "Contact information is require"
-            if(data.contact < 5) errors.contact = "Please enter a valid contact information"
-            if(!data.lastName) errors.lastName = "Enter Last Name"
-            if(data.lastName < 5) errors.lastName = "Last Name will be more then 3 Charactors"
-            if(!data.city) errors.city = "City Name is required"
-            if(!data.country) errors.country = "Country Name is required"
-            if(!data.postalCode) errors.postalCode = "Enter Postal Code"
-
-
-            return errors
+            // Validation logic here
           }}
           render={(props) => {
             return (
               <form onSubmit={props.handleSubmit}>
-                <Grid container mt={9} mb={9}   >
+                <Grid container mt={9} mb={9}>
+                    {isLocalStorageEmpty ? (
+                      <Typography>No products in the cart.</Typography>
+                    ) : (
+                      <>
+                        {/* Rest of the component code */}
+
+
+
+
                   <Grid item md={7} xs={12} mr={'20px'} sx={{ "backgroundColor": '#F8F8FD' }} >
                     <Box px={3} py={8} sx={{ "py": { xs: 4, md: 8 } }} >
                       <Box display={"flex"} justifyContent={"space-between"} sx={{ "flexDirection": { xs: "column", md: "row" }, "textAlign": "center" }} mb={2} >
@@ -171,20 +168,22 @@ const CheckOutPage = () => {
                             <Typography fontFamily={"var(--josefin)"} fontSize={"10px"} >Shipping & taxes calculated at checkout</Typography>
                           </Box>
                           <Box display={"flex"} alignItems={"center"}  >
-                            <Button variant="contained" type="submit" style={{ "backgroundColor": "#19D16F", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal", "marginBottom": "20px" }} >Proceed To Checkout</Button>
+                            <Button variant="contained" type="submit" style={{ "backgroundColor": "#19D16F", "width": "100%", "color": "white", "fontSize": "14px", "fontFamily": "var(--lato)", "fontWeight": "700", "fontStyle": "normal", "marginBottom": "20px" }} >Confirm Order</Button>
                           </Box>
                         </Box>
                       </Box>
                     </Grid>
                   </Grid>
+                      </>
+                    )}
                 </Grid>
               </form>
-            )
+            );
           }}
         />
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default CheckOutPage
+export default CheckOutPage;

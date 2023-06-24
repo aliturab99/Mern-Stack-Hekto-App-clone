@@ -1,6 +1,8 @@
+require("dotenv").config()
 const express = require("express");
 const Order = require("../models/Order");
 const { verifyuser } = require("../utils/middlewares");
+const Product = require("../models/Product");
 
 
 const router = express.Router();
@@ -24,11 +26,12 @@ router.post("/new", async (req, res) => {
             country: req.body.data.country,
             postalCode: req.body.data.postalCode,
             contactinfo: req.body.data.contactinfo,
-            products: req.body.products
+            products: req.body.products,
+            status: process.env.ORDER_STATUS_PROCESSING
         })
 
         await orderData.save()
-        res.json("Product Added Successfully")
+        res.json({success : true})
 
     } catch (err) {
         res.status(400).json(err)
@@ -48,14 +51,32 @@ router.get("/all", async (req, res) => {
       }
 })
 
+
+
+
 router.post("/singleOrder", async (req, res) => {
-    try {
-        if(!req.body.id) throw new Error("Invalid Request")
-        const order = await Order.findById(req.body.id)
-        res.status(200).json({order});
-      } catch (error) {
-        res.status(400).json({ error: error.message });
+  try {
+    if (!req.body.id) throw new Error("Invalid Request");
+
+    const order = await Order.findById(req.body.id);
+    const originalOrder = await Order.findById(req.body.id).populate('products._id');
+    
+    for (let i = 0; i < order.products.length; i++) {
+      const originalProduct = originalOrder.products[i];
+      const product = order.products[i];
+      order.products[i].productPictures = originalProduct.productPictures
+      if (originalProduct.price !== product.price) {
+        order.products[i].price = originalProduct.price;
       }
-})
+    }
+
+    await order.save(); // Save the updated order
+
+    res.status(200).json({ order });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;

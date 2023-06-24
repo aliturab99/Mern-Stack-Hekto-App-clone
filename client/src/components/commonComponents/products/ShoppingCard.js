@@ -83,9 +83,13 @@ const ShoppingCart = () => {
       }
 
 
+
+
     return (
         <Container maxWidth={"md"}>
             <Grid container mt={9} mb={9} >
+                
+
                 <Grid item md={8} xs={12}>
 
                     {/* Heading Area */}
@@ -148,8 +152,9 @@ const ShoppingCart = () => {
                                         <Grid item md={2} >
                                             <Box display={"flex"} alignItems={"center"} >
                                                 <Typography>
+                                                    $
                                                     {
-                                                        product.quantity ? `${product.price}` * `${product.quantity}` : `$${product.price}`
+                                                        product.quantity ? `${product.price}` * `${product.quantity}` : `${product.price}`
                                                     }
                                                 </Typography>
                                                 <IconButton onClick={() => handleRemoveProduct(product._id)}> <Close /> </IconButton>
@@ -207,7 +212,6 @@ const ShoppingCart = () => {
                         </Box>
                     </Grid>
                 </Grid>
-
                 {/* cart total section */}
                 <Grid item md={4} xs={12} sx={{ 'marginTop': { xs: '30px', md: "0px" } }} display={"flex"} flexDirection={"column"} >
                     <Grid item md={12} >
